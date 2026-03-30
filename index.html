@@ -7,17 +7,361 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
+<style>
+:root {
+  --bg-primary: #030712;
+  --bg-secondary: #0a0f1e;
+  --bg-card: #0d1527;
+  --bg-card-hover: #111d35;
+  --accent-cyan: #00f5ff;
+  --accent-green: #00ff88;
+  --accent-orange: #ff6b35;
+  --accent-purple: #a855f7;
+  --accent-gold: #ffd700;
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-muted: #475569;
+  --border-glow: rgba(0,245,255,0.3);
+  --border-subtle: rgba(255,255,255,0.07);
+  --shadow-cyan: 0 0 30px rgba(0,245,255,0.15);
+  --shadow-green: 0 0 30px rgba(0,255,136,0.15);
+  --font-display: 'Orbitron', monospace;
+  --font-mono: 'Share Tech Mono', monospace;
+  --font-body: 'Rajdhani', sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg-primary);color:var(--text-primary);font-family:var(--font-body);font-size:16px;line-height:1.6;overflow-x:hidden}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg-secondary)}
+::-webkit-scrollbar-thumb{background:var(--accent-cyan);border-radius:3px}
+#particle-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.4}
+.grid-overlay{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;background-image:linear-gradient(rgba(0,245,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,245,255,0.03) 1px,transparent 1px);background-size:50px 50px}
+
+/* NAV */
+#navbar{position:fixed;top:0;left:0;right:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;padding:16px 48px;background:rgba(3,7,18,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border-subtle);transition:all 0.3s}
+#navbar.scrolled{padding:10px 48px;background:rgba(3,7,18,0.98);border-bottom-color:var(--border-glow)}
+.nav-logo{font-family:var(--font-display);font-size:1.1rem;color:var(--accent-cyan);letter-spacing:2px}
+.logo-bracket{color:var(--accent-green)}
+.nav-links{display:flex;gap:8px;list-style:none}
+.nav-a{color:var(--text-secondary);text-decoration:none;font-size:0.8rem;letter-spacing:1px;padding:6px 12px;border-radius:4px;transition:all 0.3s;font-family:var(--font-mono)}
+.nav-a:hover,.nav-a.active{color:var(--accent-cyan);background:rgba(0,245,255,0.08)}
+.nav-status{font-family:var(--font-mono);font-size:0.7rem;color:var(--accent-green);display:flex;align-items:center;gap:6px}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--accent-green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 6px var(--accent-green)}50%{opacity:0.5;box-shadow:none}}
+
+/* SECTIONS */
+section{position:relative;z-index:10;padding:100px 60px 60px}
+.section-header{text-align:center;margin-bottom:60px}
+.section-tag{font-family:var(--font-mono);color:var(--accent-green);font-size:0.8rem;letter-spacing:3px;margin-bottom:12px}
+.section-title{font-family:var(--font-display);font-size:2.5rem;font-weight:700;margin-bottom:16px}
+.accent{color:var(--accent-cyan)}
+.section-sub{color:var(--text-secondary);font-size:1rem;max-width:600px;margin:0 auto}
+
+/* HERO */
+#hero{min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding-top:80px}
+.hero-content{max-width:900px;z-index:10;position:relative}
+.hero-tag{font-family:var(--font-mono);color:var(--accent-green);font-size:0.8rem;letter-spacing:4px;margin-bottom:20px}
+.hero-title{font-family:var(--font-display);font-weight:900;line-height:1.1;margin-bottom:24px}
+.title-line-1{display:block;font-size:2rem;color:var(--text-secondary)}
+.title-line-2{display:block;font-size:4.5rem;color:var(--accent-cyan);text-shadow:0 0 40px rgba(0,245,255,0.5)}
+.title-line-3{display:block;font-size:1.6rem;color:var(--text-primary)}
+.hero-sub{color:var(--text-secondary);font-size:1.1rem;max-width:650px;margin:0 auto 40px}
+.hero-cta{display:flex;gap:20px;justify-content:center;margin-bottom:60px}
+.btn-primary{padding:14px 32px;background:var(--accent-cyan);color:#000;font-family:var(--font-display);font-size:0.75rem;letter-spacing:2px;border:none;border-radius:4px;cursor:pointer;text-decoration:none;transition:all 0.3s;font-weight:700}
+.btn-primary:hover{background:#00d4e0;transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,245,255,0.4)}
+.btn-secondary{padding:14px 32px;background:transparent;color:var(--accent-cyan);font-family:var(--font-display);font-size:0.75rem;letter-spacing:2px;border:1px solid var(--accent-cyan);border-radius:4px;cursor:pointer;text-decoration:none;transition:all 0.3s}
+.btn-secondary:hover{background:rgba(0,245,255,0.08);transform:translateY(-2px)}
+.hero-stats{display:flex;gap:48px;justify-content:center}
+.stat{text-align:center}
+.stat-num{font-family:var(--font-display);font-size:2rem;color:var(--accent-cyan)}
+.stat-label{display:block;font-size:0.75rem;color:var(--text-muted);letter-spacing:2px;margin-top:4px}
+
+/* CARDS */
+.lang-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px}
+.lang-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:12px;padding:28px;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden}
+.lang-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--card-accent,var(--accent-cyan))}
+.lang-card:hover{background:var(--bg-card-hover);border-color:var(--card-accent,var(--accent-cyan));transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.4)}
+.lang-card-icon{font-size:2.5rem;margin-bottom:12px}
+.lang-card-name{font-family:var(--font-display);font-size:1rem;font-weight:700;margin-bottom:4px;color:var(--card-accent,var(--accent-cyan))}
+.lang-card-type{font-family:var(--font-mono);font-size:0.7rem;color:var(--text-muted);letter-spacing:1px;margin-bottom:10px}
+.lang-card-desc{font-size:0.85rem;color:var(--text-secondary);margin-bottom:14px;line-height:1.5}
+.tag{display:inline-block;padding:3px 10px;background:rgba(0,245,255,0.08);border:1px solid rgba(0,245,255,0.2);color:var(--accent-cyan);font-size:0.68rem;border-radius:3px;margin:2px;font-family:var(--font-mono)}
+
+/* FILTER */
+.lang-filter{display:flex;gap:10px;justify-content:center;margin-bottom:40px;flex-wrap:wrap}
+.filter-btn{padding:8px 20px;background:transparent;border:1px solid var(--border-subtle);color:var(--text-secondary);font-family:var(--font-mono);font-size:0.75rem;letter-spacing:1px;border-radius:4px;cursor:pointer;transition:all 0.3s}
+.filter-btn.active,.filter-btn:hover{border-color:var(--accent-cyan);color:var(--accent-cyan);background:rgba(0,245,255,0.08)}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px)}
+.modal-overlay.hidden{display:none}
+.modal-box{background:var(--bg-secondary);border:1px solid var(--border-glow);border-radius:16px;max-width:760px;width:100%;max-height:90vh;overflow-y:auto;padding:40px;position:relative}
+.modal-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.08);border:none;color:var(--text-secondary);font-size:1rem;width:32px;height:32px;border-radius:50%;cursor:pointer;transition:all 0.2s}
+.modal-close:hover{color:#fff;background:rgba(255,255,255,0.15)}
+.modal-lang-icon{font-size:3.5rem;margin-bottom:12px}
+.modal-lang-name{font-family:var(--font-display);font-size:2rem;font-weight:900;margin-bottom:6px}
+.modal-lang-tagline{color:var(--text-secondary);margin-bottom:30px;font-size:1rem}
+.modal-section{margin-bottom:24px}
+.modal-section h3{font-family:var(--font-mono);color:var(--accent-green);font-size:0.85rem;letter-spacing:2px;margin-bottom:12px}
+.modal-section p,.modal-section li{color:var(--text-secondary);font-size:0.9rem;line-height:1.7}
+.modal-section ul{padding-left:20px}
+.code-block{background:#060d1f;border:1px solid var(--border-subtle);border-radius:8px;padding:20px;font-family:var(--font-mono);font-size:0.8rem;color:#a8d8ea;line-height:1.8;overflow-x:auto;white-space:pre}
+.modal-tabs{display:flex;gap:8px;margin-bottom:24px;border-bottom:1px solid var(--border-subtle);padding-bottom:16px}
+.modal-tab{padding:8px 16px;background:transparent;border:1px solid var(--border-subtle);color:var(--text-secondary);font-family:var(--font-mono);font-size:0.72rem;letter-spacing:1px;border-radius:4px;cursor:pointer;transition:all 0.2s}
+.modal-tab.active,.modal-tab:hover{border-color:var(--accent-cyan);color:var(--accent-cyan);background:rgba(0,245,255,0.07)}
+
+/* LEARN MODE PANEL */
+#learn-panel{position:fixed;top:0;right:0;width:580px;height:100vh;background:var(--bg-secondary);border-left:1px solid var(--border-glow);z-index:1500;overflow-y:auto;transform:translateX(100%);transition:transform 0.4s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column}
+#learn-panel.open{transform:translateX(0)}
+.learn-header{padding:20px 24px;border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg-secondary);z-index:10}
+.learn-title{font-family:var(--font-display);font-size:0.85rem;color:var(--accent-cyan);letter-spacing:2px}
+.learn-close{background:none;border:none;color:var(--text-muted);font-size:1.2rem;cursor:pointer;padding:4px 8px;transition:color 0.2s}
+.learn-close:hover{color:var(--text-primary)}
+.learn-body{padding:24px;flex:1}
+.learn-section-title{font-family:var(--font-display);font-size:1.2rem;color:var(--accent-cyan);margin-bottom:8px}
+.learn-topic-tag{font-family:var(--font-mono);font-size:0.7rem;color:var(--accent-green);letter-spacing:2px;margin-bottom:20px}
+.learn-tabs{display:flex;gap:6px;margin-bottom:24px}
+.ltab{padding:7px 14px;background:transparent;border:1px solid var(--border-subtle);color:var(--text-muted);font-family:var(--font-mono);font-size:0.7rem;border-radius:4px;cursor:pointer;transition:all 0.2s}
+.ltab.active{border-color:var(--accent-purple);color:var(--accent-purple);background:rgba(168,85,247,0.08)}
+.learn-content-area{min-height:200px}
+.notes-block{background:#050c1e;border:1px solid var(--border-subtle);border-radius:8px;padding:20px;margin-bottom:16px}
+.notes-block h4{font-family:var(--font-mono);color:var(--accent-gold);font-size:0.8rem;letter-spacing:1px;margin-bottom:10px}
+.notes-block p,.notes-block li{color:var(--text-secondary);font-size:0.88rem;line-height:1.75}
+.notes-block ul{padding-left:18px;margin-top:8px}
+.notes-block ul li{margin-bottom:6px}
+.complexity-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:0.82rem}
+.complexity-table th{background:rgba(0,245,255,0.07);color:var(--accent-cyan);font-family:var(--font-mono);font-size:0.72rem;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border-subtle)}
+.complexity-table td{padding:8px 12px;color:var(--text-secondary);border-bottom:1px solid rgba(255,255,255,0.04)}
+.complexity-table tr:hover td{background:rgba(255,255,255,0.02)}
+.complexity-badge{display:inline-block;padding:2px 8px;border-radius:3px;font-family:var(--font-mono);font-size:0.72rem}
+.cb-green{background:rgba(0,255,136,0.12);color:var(--accent-green)}
+.cb-yellow{background:rgba(255,215,0,0.12);color:var(--accent-gold)}
+.cb-red{background:rgba(255,107,53,0.12);color:var(--accent-orange)}
+
+/* PRACTICE AREA */
+.practice-problem{background:#060e20;border:1px solid rgba(168,85,247,0.3);border-radius:10px;padding:20px;margin-bottom:16px}
+.problem-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.problem-num{font-family:var(--font-mono);color:var(--text-muted);font-size:0.8rem}
+.problem-title{font-family:var(--font-display);font-size:0.9rem;color:var(--text-primary)}
+.problem-diff{padding:2px 10px;border-radius:3px;font-family:var(--font-mono);font-size:0.68rem}
+.diff-easy{background:rgba(0,255,136,0.12);color:var(--accent-green);border:1px solid rgba(0,255,136,0.2)}
+.diff-medium{background:rgba(255,215,0,0.12);color:var(--accent-gold);border:1px solid rgba(255,215,0,0.2)}
+.diff-hard{background:rgba(255,107,53,0.12);color:var(--accent-orange);border:1px solid rgba(255,107,53,0.2)}
+.problem-desc{color:var(--text-secondary);font-size:0.85rem;line-height:1.6;margin-bottom:12px}
+.problem-example{background:#030812;border:1px solid var(--border-subtle);border-radius:6px;padding:12px;margin-bottom:12px;font-family:var(--font-mono);font-size:0.8rem;color:#a8d8ea}
+.problem-actions{display:flex;gap:8px;flex-wrap:wrap}
+.prob-btn{padding:6px 14px;border-radius:4px;font-family:var(--font-mono);font-size:0.72rem;cursor:pointer;transition:all 0.2s;border:1px solid}
+.prob-btn-hint{background:rgba(255,215,0,0.08);color:var(--accent-gold);border-color:rgba(255,215,0,0.3)}
+.prob-btn-hint:hover{background:rgba(255,215,0,0.15)}
+.prob-btn-solve{background:rgba(0,245,255,0.08);color:var(--accent-cyan);border-color:rgba(0,245,255,0.3)}
+.prob-btn-solve:hover{background:rgba(0,245,255,0.15)}
+.prob-btn-explain{background:rgba(168,85,247,0.08);color:var(--accent-purple);border-color:rgba(168,85,247,0.3)}
+.prob-btn-explain:hover{background:rgba(168,85,247,0.15)}
+.ai-response-box{margin-top:12px;background:#030812;border:1px solid rgba(168,85,247,0.25);border-radius:8px;padding:16px;display:none}
+.ai-response-box.visible{display:block}
+.ai-response-label{font-family:var(--font-mono);color:var(--accent-purple);font-size:0.7rem;letter-spacing:2px;margin-bottom:10px}
+.ai-response-text{color:var(--text-secondary);font-size:0.85rem;line-height:1.75;white-space:pre-wrap}
+.ai-loader{display:inline-flex;gap:4px;align-items:center}
+.ai-loader span{width:4px;height:4px;border-radius:50%;background:var(--accent-purple);animation:bounce 0.8s infinite}
+.ai-loader span:nth-child(2){animation-delay:0.15s}
+.ai-loader span:nth-child(3){animation-delay:0.3s}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+/* ROADMAP */
+.roadmap-container{position:relative;max-width:900px;margin:0 auto}
+.roadmap-line{position:absolute;left:50%;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--accent-cyan),var(--accent-purple),var(--accent-green));transform:translateX(-50%)}
+.roadmap-steps{display:flex;flex-direction:column;gap:40px}
+.roadmap-step{display:grid;grid-template-columns:1fr 80px 1fr;align-items:center;gap:20px}
+.roadmap-step.left .roadmap-step-content{grid-column:1;text-align:right}
+.roadmap-step.left .roadmap-spacer{grid-column:3}
+.roadmap-step.right .roadmap-step-content{grid-column:3;text-align:left}
+.roadmap-step.right .roadmap-spacer{grid-column:1}
+.roadmap-node{grid-column:2;width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:0.65rem;font-weight:700;border:2px solid;margin:0 auto;letter-spacing:1px;text-align:center;line-height:1.2}
+.roadmap-step-content{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:12px;padding:20px}
+.roadmap-salary{font-family:var(--font-display);font-size:1.3rem;font-weight:700;margin-bottom:6px}
+.roadmap-title{font-size:1rem;font-weight:600;color:var(--text-primary);margin-bottom:6px}
+.roadmap-desc{font-size:0.85rem;color:var(--text-secondary);margin-bottom:12px}
+.skill-pill{display:inline-block;padding:3px 10px;background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.3);color:var(--accent-purple);font-size:0.7rem;border-radius:20px;margin:2px;font-family:var(--font-mono)}
+
+/* DSA */
+.dsa-tabs,.interview-tabs{display:flex;gap:8px;margin-bottom:30px;justify-content:center;flex-wrap:wrap}
+.dsa-tab,.int-tab{padding:10px 24px;background:transparent;border:1px solid var(--border-subtle);color:var(--text-secondary);font-family:var(--font-mono);font-size:0.75rem;letter-spacing:1px;border-radius:4px;cursor:pointer;transition:all 0.3s}
+.dsa-tab.active,.int-tab.active{border-color:var(--accent-cyan);color:var(--accent-cyan);background:rgba(0,245,255,0.08)}
+#dsa-content,.company-grid,.hack-grid,#interview-content{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
+.dsa-card,.int-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:12px;padding:24px;transition:all 0.3s;position:relative}
+.dsa-card:hover,.int-card:hover{border-color:rgba(0,245,255,0.2);transform:translateY(-2px)}
+.dsa-card-title,.int-card-title{font-family:var(--font-display);font-size:0.95rem;font-weight:700;margin-bottom:8px;color:var(--text-primary)}
+.difficulty-badge{display:inline-block;padding:3px 10px;border-radius:3px;font-family:var(--font-mono);font-size:0.68rem;margin-bottom:10px}
+.diff-easy{background:rgba(0,255,136,0.1);color:var(--accent-green);border:1px solid rgba(0,255,136,0.2)}
+.diff-medium{background:rgba(255,215,0,0.1);color:var(--accent-gold);border:1px solid rgba(255,215,0,0.2)}
+.diff-hard{background:rgba(255,107,53,0.1);color:var(--accent-orange);border:1px solid rgba(255,107,53,0.2)}
+.dsa-card-body{color:var(--text-secondary);font-size:0.85rem;margin-bottom:10px;line-height:1.5}
+.dsa-card-list{padding-left:18px;color:var(--text-secondary);font-size:0.83rem}
+.dsa-card-list li{padding:3px 0}
+
+/* LEARN BUTTON on cards */
+.learn-btn{position:absolute;top:16px;right:16px;padding:5px 12px;background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.3);color:var(--accent-purple);font-family:var(--font-mono);font-size:0.68rem;border-radius:4px;cursor:pointer;transition:all 0.2s;letter-spacing:1px}
+.learn-btn:hover{background:rgba(168,85,247,0.2)}
+
+/* COMPANIES */
+.company-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:12px;padding:24px;transition:all 0.3s;border-top:2px solid var(--company-color,var(--accent-cyan))}
+.company-card:hover{background:var(--bg-card-hover);transform:translateY(-3px)}
+.company-logo{font-size:2rem;margin-bottom:8px}
+.company-name{font-family:var(--font-display);font-size:1rem;font-weight:700;margin-bottom:4px}
+.company-type{font-family:var(--font-mono);font-size:0.7rem;color:var(--text-muted);letter-spacing:1px;margin-bottom:6px}
+.company-salary{color:var(--accent-green);font-family:var(--font-display);font-size:0.85rem;margin-bottom:8px}
+.company-focus{color:var(--text-secondary);font-size:0.82rem;margin-bottom:10px;line-height:1.5}
+
+/* HACKATHONS */
+.hack-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:12px;padding:24px;transition:all 0.3s;position:relative}
+.hack-card:hover{border-color:rgba(0,245,255,0.2);transform:translateY(-3px)}
+.hack-badge{position:absolute;top:16px;right:16px;padding:3px 10px;border-radius:3px;font-size:0.7rem;font-family:var(--font-mono)}
+.hack-india{background:rgba(255,153,0,0.12);color:#ff9900;border:1px solid rgba(255,153,0,0.3)}
+.hack-global{background:rgba(0,245,255,0.08);color:var(--accent-cyan);border:1px solid rgba(0,245,255,0.2)}
+.hack-icon{font-size:2rem;margin-bottom:8px}
+.hack-name{font-family:var(--font-display);font-size:0.9rem;font-weight:700;margin-bottom:4px;padding-right:80px}
+.hack-org{font-family:var(--font-mono);font-size:0.7rem;color:var(--text-muted);margin-bottom:8px}
+.hack-desc{color:var(--text-secondary);font-size:0.82rem;margin-bottom:10px;line-height:1.5}
+.hack-prize{color:var(--accent-gold);font-family:var(--font-mono);font-size:0.8rem}
+
+/* ROBOT */
+#robot-container{position:fixed;bottom:30px;left:30px;z-index:1200;display:flex;flex-direction:column;align-items:center;gap:10px}
+#robot{width:60px;height:80px;cursor:pointer;position:relative;animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.robot-antenna{width:4px;height:14px;background:var(--accent-cyan);margin:0 auto;border-radius:2px;position:relative}
+.antenna-tip{width:8px;height:8px;border-radius:50%;background:var(--accent-green);position:absolute;top:-4px;left:-2px;animation:pulse 1.5s infinite}
+.robot-head{width:50px;height:36px;background:linear-gradient(135deg,#1a2744,#0f1f3d);border:1.5px solid var(--accent-cyan);border-radius:8px;margin:0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;box-shadow:0 0 15px rgba(0,245,255,0.3)}
+.robot-eyes{display:flex;gap:10px}
+.eye{width:10px;height:10px;border-radius:50%;background:var(--accent-cyan);position:relative;animation:blink 4s infinite}
+@keyframes blink{0%,45%,55%,100%{transform:scaleY(1)}50%{transform:scaleY(0.1)}}
+.pupil{width:4px;height:4px;border-radius:50%;background:#000;position:absolute;top:3px;left:3px}
+.robot-mouth{display:flex;gap:3px}
+.mouth-bar{width:6px;height:2px;background:var(--accent-green);border-radius:1px}
+.robot-body{width:44px;height:26px;background:linear-gradient(135deg,#152038,#0a1428);border:1.5px solid rgba(0,245,255,0.5);border-radius:6px;margin:2px auto 0;display:flex;align-items:center;justify-content:center}
+.chest-light{width:8px;height:8px;border-radius:50%;background:var(--accent-green);box-shadow:0 0 8px var(--accent-green)}
+.robot-arms{display:flex;justify-content:space-between;width:60px;margin:-18px auto 0}
+.arm{width:8px;height:20px;background:linear-gradient(135deg,#1a2744,#0f1f3d);border:1px solid rgba(0,245,255,0.4);border-radius:4px}
+.hand{width:10px;height:8px;background:#1a2744;border:1px solid rgba(0,245,255,0.4);border-radius:3px;margin-top:20px;margin-left:-1px}
+#robot-speech{background:rgba(13,21,39,0.95);border:1px solid var(--accent-cyan);border-radius:10px;padding:8px 14px;font-family:var(--font-mono);font-size:0.72rem;color:var(--accent-cyan);max-width:200px;text-align:center;box-shadow:var(--shadow-cyan);animation:fadeIn 0.3s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+#robot-speech.hidden{display:none}
+.cursor-blink{animation:cursorBlink 0.7s infinite}
+@keyframes cursorBlink{0%,100%{opacity:1}50%{opacity:0}}
+#robot-toggle{padding:7px 14px;background:rgba(0,245,255,0.1);border:1px solid var(--accent-cyan);color:var(--accent-cyan);font-family:var(--font-mono);font-size:0.68rem;border-radius:4px;cursor:pointer;letter-spacing:1px;transition:all 0.2s}
+#robot-toggle:hover{background:rgba(0,245,255,0.2)}
+
+/* CHAT PANEL */
+#chat-panel{position:fixed;bottom:30px;left:110px;width:360px;background:var(--bg-secondary);border:1px solid var(--border-glow);border-radius:14px;z-index:1200;display:flex;flex-direction:column;max-height:500px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+#chat-panel.hidden{display:none}
+.chat-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border-subtle);background:rgba(0,245,255,0.04)}
+.chat-title{font-family:var(--font-mono);font-size:0.72rem;color:var(--accent-cyan);letter-spacing:1px}
+#close-chat{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:1rem;transition:color 0.2s}
+#close-chat:hover{color:var(--text-primary)}
+#chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;min-height:200px}
+.chat-msg{display:flex;gap:8px;align-items:flex-start}
+.chat-msg.user{flex-direction:row-reverse}
+.chat-avatar{width:28px;height:28px;border-radius:50%;background:var(--bg-card);border:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0}
+.chat-bubble{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:10px;padding:10px 14px;font-size:0.82rem;color:var(--text-secondary);line-height:1.5;white-space:pre-wrap;max-width:260px}
+.chat-msg.user .chat-bubble{background:rgba(0,245,255,0.08);border-color:rgba(0,245,255,0.2);color:var(--text-primary)}
+.chat-input-row{display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--border-subtle)}
+#chat-input{flex:1;background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:6px;padding:8px 12px;color:var(--text-primary);font-family:var(--font-mono);font-size:0.78rem;outline:none}
+#chat-input:focus{border-color:var(--accent-cyan)}
+#chat-send{padding:8px 14px;background:var(--accent-cyan);color:#000;border:none;border-radius:6px;font-family:var(--font-mono);font-size:0.72rem;cursor:pointer;font-weight:700;transition:all 0.2s}
+#chat-send:hover{background:#00d4e0}
+.quick-prompts{display:flex;flex-wrap:wrap;gap:6px;padding:8px 14px 12px;border-top:1px solid var(--border-subtle)}
+.qp{padding:5px 10px;background:rgba(0,245,255,0.06);border:1px solid rgba(0,245,255,0.15);color:var(--text-secondary);font-size:0.68rem;border-radius:4px;cursor:pointer;transition:all 0.2s;font-family:var(--font-mono)}
+.qp:hover{color:var(--accent-cyan);border-color:var(--accent-cyan)}
+
+/* NOTES SIDEBAR (new addition) */
+#notes-sidebar{position:fixed;top:80px;right:0;width:340px;height:calc(100vh - 80px);background:var(--bg-secondary);border-left:1px solid var(--border-subtle);z-index:900;overflow-y:auto;transform:translateX(100%);transition:transform 0.3s ease}
+#notes-sidebar.open{transform:translateX(0)}
+.sidebar-header{padding:16px 20px;border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between}
+.sidebar-title{font-family:var(--font-display);font-size:0.8rem;color:var(--accent-gold);letter-spacing:2px}
+.sidebar-close{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:1rem}
+.note-item{padding:16px 20px;border-bottom:1px solid var(--border-subtle);cursor:pointer;transition:background 0.2s}
+.note-item:hover{background:rgba(255,255,255,0.03)}
+.note-item-title{font-size:0.9rem;color:var(--text-primary);margin-bottom:4px}
+.note-item-meta{font-family:var(--font-mono);font-size:0.68rem;color:var(--text-muted)}
+.notes-empty{padding:40px 20px;text-align:center;color:var(--text-muted);font-size:0.85rem}
+
+/* NOTES TOGGLE BTN */
+#notes-toggle-btn{position:fixed;top:50%;right:0;transform:translateY(-50%);background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);border-right:none;color:var(--accent-gold);font-family:var(--font-mono);font-size:0.68rem;padding:10px 6px;writing-mode:vertical-rl;letter-spacing:2px;cursor:pointer;border-radius:6px 0 0 6px;z-index:800;transition:all 0.2s}
+#notes-toggle-btn:hover{background:rgba(255,215,0,0.2)}
+
+/* REVEAL ANIMATION */
+.reveal{opacity:0;transform:translateY(20px);transition:all 0.6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* FOOTER */
+#footer{position:relative;z-index:10;padding:40px 60px;border-top:1px solid var(--border-subtle);text-align:center}
+.footer-logo{font-family:var(--font-display);font-size:1.2rem;color:var(--accent-cyan);margin-bottom:12px}
+.footer-sub{color:var(--text-secondary);margin-bottom:16px;font-size:0.9rem}
+.footer-credits{display:flex;gap:16px;justify-content:center;font-family:var(--font-mono);font-size:0.75rem;color:var(--text-muted)}
+.sep{color:var(--text-muted)}
+
+/* PROGRESS TRACKER */
+.progress-section{padding:12px 0;margin-bottom:20px}
+.progress-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;font-size:0.83rem;color:var(--text-secondary)}
+.progress-bar{flex:1;height:4px;background:rgba(255,255,255,0.07);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;border-radius:2px;transition:width 0.5s ease}
+.progress-label{font-family:var(--font-mono);font-size:0.68rem;color:var(--text-muted);min-width:36px;text-align:right}
+
+/* QUIZ */
+.quiz-question{font-size:0.9rem;color:var(--text-primary);margin-bottom:14px;line-height:1.6}
+.quiz-options{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.quiz-opt{padding:10px 14px;background:rgba(255,255,255,0.04);border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-secondary);font-size:0.85rem;cursor:pointer;transition:all 0.2s;text-align:left}
+.quiz-opt:hover{border-color:rgba(0,245,255,0.3);color:var(--text-primary)}
+.quiz-opt.correct{background:rgba(0,255,136,0.1);border-color:var(--accent-green);color:var(--accent-green)}
+.quiz-opt.wrong{background:rgba(255,107,53,0.1);border-color:var(--accent-orange);color:var(--accent-orange)}
+.quiz-feedback{font-size:0.85rem;color:var(--text-secondary);line-height:1.6;background:#050c1e;padding:12px;border-radius:6px;border-left:3px solid var(--accent-purple);margin-top:10px;display:none}
+.quiz-feedback.show{display:block}
+.quiz-next-btn{padding:8px 18px;background:rgba(0,245,255,0.1);border:1px solid rgba(0,245,255,0.3);color:var(--accent-cyan);font-family:var(--font-mono);font-size:0.72rem;border-radius:4px;cursor:pointer;margin-top:10px;transition:all 0.2s}
+.quiz-next-btn:hover{background:rgba(0,245,255,0.2)}
+
+/* HERO 3D */
+.hero-3d-scene{position:absolute;right:8%;top:50%;transform:translateY(-50%);width:300px;height:300px;pointer-events:none;opacity:0.6}
+@media (max-width:900px){.hero-3d-scene{display:none}}
+.scene-wrapper{position:relative;width:100%;height:100%}
+.cube-container{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80px;height:80px;perspective:400px}
+.cube{width:80px;height:80px;position:relative;transform-style:preserve-3d;animation:rotateCube 12s linear infinite}
+@keyframes rotateCube{0%{transform:rotateX(15deg) rotateY(0deg)}100%{transform:rotateX(15deg) rotateY(360deg)}}
+.face{position:absolute;width:80px;height:80px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:1.2rem;font-weight:700;color:var(--accent-cyan);border:1px solid rgba(0,245,255,0.4);background:rgba(0,245,255,0.05)}
+.face.front{transform:translateZ(40px)}
+.face.back{transform:rotateY(180deg) translateZ(40px)}
+.face.left{transform:rotateY(-90deg) translateZ(40px)}
+.face.right{transform:rotateY(90deg) translateZ(40px)}
+.face.top{transform:rotateX(90deg) translateZ(40px)}
+.face.bottom{transform:rotateX(-90deg) translateZ(40px)}
+.orbit-ring{position:absolute;top:50%;left:50%;border:1px solid rgba(0,245,255,0.2);border-radius:50%}
+.ring-1{width:200px;height:200px;margin:-100px;animation:spin 8s linear infinite}
+.ring-2{width:280px;height:280px;margin:-140px;animation:spin 14s linear infinite reverse}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.glitch{position:relative}
+.glitch::before,.glitch::after{content:attr(data-text);position:absolute;left:0;top:0;width:100%;height:100%;font-family:inherit;font-size:inherit}
+.glitch::before{color:var(--accent-orange);animation:glitch1 3s infinite}
+.glitch::after{color:var(--accent-purple);animation:glitch2 3s infinite}
+@keyframes glitch1{0%,90%,100%{opacity:0;clip-path:none}91%{opacity:0.8;clip-path:polygon(0 20%,100% 20%,100% 40%,0 40%);transform:translate(-3px,0)}}
+@keyframes glitch2{0%,93%,100%{opacity:0;clip-path:none}94%{opacity:0.6;clip-path:polygon(0 60%,100% 60%,100% 80%,0 80%);transform:translate(3px,0)}}
+</style>
 </head>
 <body>
-
-<!-- Particle Canvas Background -->
 <canvas id="particle-canvas"></canvas>
-
-<!-- Grid Overlay -->
 <div class="grid-overlay"></div>
 
-<!-- ROBOT ASSISTANT -->
+<!-- NOTES SIDEBAR TOGGLE -->
+<button id="notes-toggle-btn">📓 NOTES</button>
+
+<!-- NOTES SIDEBAR -->
+<div id="notes-sidebar">
+  <div class="sidebar-header">
+    <span class="sidebar-title">📓 MY NOTES</span>
+    <button class="sidebar-close" onclick="document.getElementById('notes-sidebar').classList.remove('open')">✕</button>
+  </div>
+  <div id="notes-list"></div>
+</div>
+
+<!-- ROBOT -->
 <div id="robot-container">
   <div id="robot">
     <div class="robot-antenna"><div class="antenna-tip"></div></div>
@@ -26,31 +370,16 @@
         <div class="eye left-eye"><div class="pupil"></div></div>
         <div class="eye right-eye"><div class="pupil"></div></div>
       </div>
-      <div class="robot-mouth">
-        <span class="mouth-bar"></span><span class="mouth-bar"></span><span class="mouth-bar"></span>
-      </div>
+      <div class="robot-mouth"><span class="mouth-bar"></span><span class="mouth-bar"></span><span class="mouth-bar"></span></div>
     </div>
-    <div class="robot-body">
-      <div class="robot-chest">
-        <div class="chest-light"></div>
-        <div class="chest-grid">
-          <div class="cg-cell"></div><div class="cg-cell"></div>
-          <div class="cg-cell"></div><div class="cg-cell"></div>
-        </div>
-      </div>
-    </div>
-    <div class="robot-arms">
-      <div class="arm left-arm"><div class="hand"></div></div>
-      <div class="arm right-arm"><div class="hand"></div></div>
-    </div>
+    <div class="robot-body"><div class="robot-chest"><div class="chest-light"></div></div></div>
+    <div class="robot-arms"><div class="arm left-arm"><div class="hand"></div></div><div class="arm right-arm"><div class="hand"></div></div></div>
   </div>
-  <div id="robot-speech" class="hidden">
-    <span id="robot-text"></span><span class="cursor-blink">|</span>
-  </div>
+  <div id="robot-speech" class="hidden"><span id="robot-text"></span><span class="cursor-blink">|</span></div>
   <button id="robot-toggle">🤖 Ask ARIA</button>
 </div>
 
-<!-- ROBOT CHAT PANEL -->
+<!-- CHAT PANEL -->
 <div id="chat-panel" class="hidden">
   <div class="chat-header">
     <span class="chat-title">⚡ ARIA — AI Research Intelligence Assistant</span>
@@ -65,15 +394,30 @@
     <button class="qp" data-q="What's the roadmap to reach 50 LPA?">50 LPA Roadmap</button>
     <button class="qp" data-q="List top hackathons in India">Hackathons</button>
     <button class="qp" data-q="Explain arrays vs linked lists">DSA Basics</button>
-    <button class="qp" data-q="Top companies hiring freshers in India">Top Companies</button>
+    <button class="qp" data-q="Top companies hiring freshers">Top Companies</button>
+  </div>
+</div>
+
+<!-- LEARN PANEL (slides in from right) -->
+<div id="learn-panel">
+  <div class="learn-header">
+    <span class="learn-title" id="learn-panel-title">LEARN MODE</span>
+    <button class="learn-close" onclick="closeLearnPanel()">✕</button>
+  </div>
+  <div class="learn-body" id="learn-panel-body"></div>
+</div>
+
+<!-- LANG MODAL -->
+<div id="lang-modal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <button class="modal-close" id="modal-close">✕</button>
+    <div id="modal-content"></div>
   </div>
 </div>
 
 <!-- NAV -->
 <nav id="navbar">
-  <div class="nav-logo">
-    <span class="logo-bracket">&lt;</span>DevQuest<span class="logo-bracket">/&gt;</span>
-  </div>
+  <div class="nav-logo"><span class="logo-bracket">&lt;</span>DevQuest<span class="logo-bracket">/&gt;</span></div>
   <ul class="nav-links">
     <li><a href="#hero" class="nav-a active">Home</a></li>
     <li><a href="#languages" class="nav-a">Languages</a></li>
@@ -86,24 +430,19 @@
   <div class="nav-status"><span class="status-dot"></span> System Online</div>
 </nav>
 
-<!-- HERO SECTION -->
+<!-- HERO -->
 <section id="hero">
   <div class="hero-3d-scene">
     <div class="scene-wrapper">
-      <div class="cube-container" id="cube3d">
+      <div class="cube-container">
         <div class="cube">
-          <div class="face front">{ }</div>
-          <div class="face back">&lt;/&gt;</div>
-          <div class="face left">01</div>
-          <div class="face right">Σ</div>
-          <div class="face top">∞</div>
-          <div class="face bottom">λ</div>
+          <div class="face front">{ }</div><div class="face back">&lt;/&gt;</div>
+          <div class="face left">01</div><div class="face right">Σ</div>
+          <div class="face top">∞</div><div class="face bottom">λ</div>
         </div>
       </div>
       <div class="orbit-ring ring-1"></div>
       <div class="orbit-ring ring-2"></div>
-      <div class="orbit-dot dot-1"></div>
-      <div class="orbit-dot dot-2"></div>
     </div>
   </div>
   <div class="hero-content">
@@ -113,10 +452,10 @@
       <span class="title-line-2 glitch" data-text="CODE.">CODE.</span>
       <span class="title-line-3">OWN YOUR CAREER.</span>
     </h1>
-    <p class="hero-sub">From first syntax to ₹50L+ packages — your complete developer command center. Languages, DSA, companies, hackathons & interviews.</p>
+    <p class="hero-sub">From first syntax to ₹50L+ packages — learn, practice, and ace your interviews. Notes, quizzes, AI explanations & more.</p>
     <div class="hero-cta">
       <a href="#languages" class="btn-primary">Explore Arsenal</a>
-      <a href="#roadmap" class="btn-secondary">View Roadmap →</a>
+      <a href="#dsa" class="btn-secondary">Start Learning →</a>
     </div>
     <div class="hero-stats">
       <div class="stat"><span class="stat-num" data-target="15">0</span><span class="stat-label">Languages</span></div>
@@ -127,12 +466,12 @@
   </div>
 </section>
 
-<!-- LANGUAGES SECTION -->
+<!-- LANGUAGES -->
 <section id="languages">
   <div class="section-header">
     <div class="section-tag">// MODULE_01</div>
     <h2 class="section-title">Language <span class="accent">Arsenal</span></h2>
-    <p class="section-sub">Core knowledge bases for every major programming language</p>
+    <p class="section-sub">Click any card for full notes, syntax guide & ecosystem. Use Learn Mode for interactive study.</p>
   </div>
   <div class="lang-filter">
     <button class="filter-btn active" data-filter="all">All</button>
@@ -144,15 +483,7 @@
   <div class="lang-grid" id="lang-grid"></div>
 </section>
 
-<!-- LANGUAGE MODAL -->
-<div id="lang-modal" class="modal-overlay hidden">
-  <div class="modal-box">
-    <button class="modal-close" id="modal-close">✕</button>
-    <div id="modal-content"></div>
-  </div>
-</div>
-
-<!-- ROADMAP SECTION -->
+<!-- ROADMAP -->
 <section id="roadmap">
   <div class="section-header">
     <div class="section-tag">// MODULE_02</div>
@@ -162,12 +493,12 @@
   <div class="roadmap-container" id="roadmap-container"></div>
 </section>
 
-<!-- DSA SECTION -->
+<!-- DSA -->
 <section id="dsa">
   <div class="section-header">
     <div class="section-tag">// MODULE_03</div>
     <h2 class="section-title">DSA <span class="accent">Arsenal</span></h2>
-    <p class="section-sub">Data Structures & Algorithms — organized by difficulty & topic</p>
+    <p class="section-sub">Click <span style="color:var(--accent-purple)">Learn</span> on any card for notes, complexity tables, practice problems & AI hints</p>
   </div>
   <div class="dsa-tabs">
     <button class="dsa-tab active" data-tab="ds">Data Structures</button>
@@ -177,7 +508,7 @@
   <div id="dsa-content"></div>
 </section>
 
-<!-- COMPANIES SECTION -->
+<!-- COMPANIES -->
 <section id="companies">
   <div class="section-header">
     <div class="section-tag">// MODULE_04</div>
@@ -187,7 +518,7 @@
   <div class="company-grid" id="company-grid"></div>
 </section>
 
-<!-- HACKATHONS SECTION -->
+<!-- HACKATHONS -->
 <section id="hackathons">
   <div class="section-header">
     <div class="section-tag">// MODULE_05</div>
@@ -197,12 +528,12 @@
   <div class="hack-grid" id="hack-grid"></div>
 </section>
 
-<!-- INTERVIEW SECTION -->
+<!-- INTERVIEWS -->
 <section id="interviews">
   <div class="section-header">
     <div class="section-tag">// MODULE_06</div>
     <h2 class="section-title">Interview <span class="accent">Prep</span></h2>
-    <p class="section-sub">HR, Technical, System Design & Behavioral — all covered</p>
+    <p class="section-sub">HR, Technical, System Design & Behavioral — all covered. Click Learn on any card.</p>
   </div>
   <div class="interview-tabs">
     <button class="int-tab active" data-tab="technical">Technical</button>
@@ -213,24 +544,661 @@
   <div id="interview-content"></div>
 </section>
 
-<!-- FOOTER -->
 <footer id="footer">
   <div class="footer-inner">
     <div class="footer-logo"><span class="logo-bracket">&lt;</span>DevQuest<span class="logo-bracket">/&gt;</span></div>
-    <p class="footer-sub">Built for developers, by developers. Go build something legendary.</p>
-    <div class="footer-credits">
-      <span>© 2025 DevQuest</span>
-      <span class="sep">·</span>
-      <span>Powered by ARIA AI</span>
-      <span class="sep">·</span>
-      <span>Made with ⚡ for coders</span>
-    </div>
+    <p class="footer-sub">Built for developers, by developers. Learn → Practice → Ship.</p>
+    <div class="footer-credits"><span>© 2025 DevQuest</span><span class="sep">·</span><span>Powered by ARIA AI</span><span class="sep">·</span><span>Made with ⚡ for coders</span></div>
   </div>
 </footer>
 
-<script src="js/data.js"></script>
-<script src="js/robot.js"></script>
-<script src="js/particles.js"></script>
-<script src="js/app.js"></script>
+<script>
+// =================== DATABASE ===================
+const DB = {
+  languages: [
+    { id:"python", name:"Python", icon:"🐍", type:"data", category:["data","web"], tagline:"The most versatile language of the decade", accent:"#3776AB", tags:["Interpreted","Dynamically Typed","OOP","Scripting"], desc:"Elegant, readable and explosively popular for data science, AI/ML, backend development and automation.", overview:"Python was created by Guido van Rossum (1991). It emphasizes code readability and supports multiple paradigms: procedural, OOP, and functional.", uses:["Data Science & Machine Learning","Web Development (Django, Flask, FastAPI)","Automation & Scripting","Artificial Intelligence","Scientific Computing","DevOps & Infrastructure"], syntax:`# Hello World\nprint("Hello, World!")\n\n# Functions\ndef greet(name: str) -> str:\n    return f"Hello, {name}!"\n\n# List Comprehension\nsquares = [x**2 for x in range(10)]\n\n# Classes\nclass Developer:\n    def __init__(self, name, lang):\n        self.name = name\n        self.lang = lang`, ecosystem:["NumPy","Pandas","TensorFlow","PyTorch","Django","Flask","FastAPI","Scikit-learn"], salary:"₹5L–₹40L+ (varies by domain)", topCompanies:["Google","Netflix","Instagram","Dropbox","Spotify"],
+      notes: `**Python Core Concepts:**\n\n**Variables & Types:** Python is dynamically typed — no need to declare types. Uses duck typing.\n\n**Indentation:** Python uses whitespace (4 spaces) instead of braces. This IS the syntax.\n\n**Key Data Types:**\n- int, float, complex — Numbers\n- str — Immutable strings\n- list — Ordered, mutable\n- tuple — Ordered, immutable\n- dict — Key-value pairs\n- set — Unique elements\n\n**GIL (Global Interpreter Lock):** CPython's thread lock — one thread runs at a time. Use multiprocessing for CPU tasks, asyncio for I/O.\n\n**Memory Management:** Automatic via reference counting + garbage collector. Objects are heap-allocated.\n\n**Common Pitfalls:**\n- Mutable default arguments: def foo(lst=[])\n- Late binding closures in loops\n- Not using context managers (with open())`
+    },
+    { id:"javascript", name:"JavaScript", icon:"⚡", type:"web", category:["web"], tagline:"The language of the web — runs everywhere", accent:"#F7DF1E", tags:["Interpreted","Event-Driven","Async","Full Stack"], desc:"The only language that runs natively in browsers. With Node.js, it conquered backend too.", overview:"Created by Brendan Eich at Netscape (1995). Evolved from simple scripting to full-stack: frontend, backend, mobile, desktop.", uses:["Frontend Web Development","Backend (Node.js)","Mobile Apps (React Native)","Desktop Apps (Electron)","Browser Extensions","Real-time Applications"], syntax:`// Arrow Functions & Destructuring\nconst greet = (name) => \`Hello, \${name}!\`;\n\n// Async/Await\nconst fetchData = async (url) => {\n  try {\n    const res = await fetch(url);\n    return await res.json();\n  } catch (err) { console.error(err); }\n};\n\n// ES6 Classes\nclass Dev {\n  constructor(name) { this.name = name; }\n  greet() { return \`Hi, I'm \${this.name}\`; }\n}`, ecosystem:["React","Vue","Angular","Node.js","Express","Next.js","TypeScript","Webpack"], salary:"₹4L–₹35L+ (frontend/fullstack)", topCompanies:["Google","Facebook","Airbnb","Uber","LinkedIn"],
+      notes: `**JavaScript Core Concepts:**\n\n**Hoisting:** var declarations and function declarations are hoisted to top of scope. let/const are hoisted but not initialized (TDZ).\n\n**Closures:** A function + its lexical environment. Functions remember variables from their outer scope even after outer function returns.\n\n**Event Loop:** JS is single-threaded. Call stack + web APIs + callback queue + microtask queue. Promises use microtask queue (higher priority).\n\n**Prototypal Inheritance:** Objects inherit directly from other objects via prototype chain. Class syntax is syntactic sugar.\n\n**this keyword:** Depends on how a function is called:\n- Regular function: global/undefined (strict)\n- Method: the object\n- Arrow function: lexically bound (parent's this)\n- bind/call/apply: explicitly set\n\n**Common Interview Topics:**\n- Difference: == vs ===\n- What is debouncing/throttling?\n- Explain Promise.all vs Promise.race\n- What is the difference between null and undefined?`
+    },
+    { id:"java", name:"Java", icon:"☕", type:"backend", category:["systems","web"], tagline:"Write once, run anywhere — enterprise powerhouse", accent:"#ED8B00", tags:["Compiled","Statically Typed","OOP","JVM"], desc:"The backbone of enterprise software and Android. Known for robustness, performance, and massive ecosystem.", overview:"James Gosling at Sun Microsystems (1995). 'Write Once, Run Anywhere' via JVM. Powers Android, enterprise apps, and big data (Hadoop, Spark).", uses:["Enterprise Applications","Android Development","Web Backend (Spring)","Big Data (Hadoop, Spark)","Financial Systems","Microservices"], syntax:`// Hello World\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello, World!");\n    }\n}\n\n// Generics\npublic <T> List<T> filter(List<T> list, Predicate<T> pred) {\n    return list.stream().filter(pred).collect(Collectors.toList());\n}`, ecosystem:["Spring Boot","Hibernate","Maven","Gradle","JUnit","Kafka","Spark"], salary:"₹5L–₹45L+", topCompanies:["Amazon","Goldman Sachs","JP Morgan","Oracle","Infosys"],
+      notes: `**Java Core Concepts:**\n\n**JVM Architecture:** Source → bytecode (.class) → JVM interprets/JIT compiles. Platform independent.\n\n**Memory Model:**\n- Heap: Objects, class instances\n- Stack: Method frames, local vars\n- Method Area: Class metadata\n- GC: Automatic with generational collection\n\n**OOP Pillars:**\n- Encapsulation: private fields + getters/setters\n- Inheritance: extends (single), implements (multiple)\n- Polymorphism: method overriding + overloading\n- Abstraction: abstract classes + interfaces\n\n**Collections Framework:**\n- List: ArrayList (O(1) get), LinkedList (O(1) add/remove)\n- Map: HashMap (O(1) avg), TreeMap (O(log n), sorted)\n- Set: HashSet, TreeSet, LinkedHashSet\n\n**Concurrency:**\n- Thread, Runnable, Callable\n- synchronized keyword\n- java.util.concurrent (ExecutorService, locks)\n- volatile for visibility`
+    },
+    { id:"cpp", name:"C++", icon:"⚙️", type:"systems", category:["systems"], tagline:"Performance-critical systems at native speed", accent:"#00599C", tags:["Compiled","Statically Typed","OOP","Low-level"], desc:"The go-to language for performance-critical applications: game engines, compilers, OS, trading systems.", overview:"Bjarne Stroustrup (1985). C with classes. Near zero-cost abstractions, manual memory management via RAII. Powers game engines, OS kernels, trading.", uses:["System Programming","Game Development","Competitive Programming","Embedded Systems","High-Frequency Trading","Compilers & Interpreters"], syntax:`#include <iostream>\n#include <vector>\nusing namespace std;\n\ntemplate<typename T>\nvoid quickSort(vector<T>& arr, int l, int r) {\n    if (l < r) {\n        int p = partition(arr, l, r);\n        quickSort(arr, l, p - 1);\n        quickSort(arr, p + 1, r);\n    }\n}`, ecosystem:["STL","Boost","Qt","OpenGL","CUDA","CMake","LLVM"], salary:"₹8L–₹50L+", topCompanies:["Google","Microsoft","Adobe","Goldman Sachs","NVIDIA"],
+      notes: `**C++ Core Concepts:**\n\n**Memory Management:**\n- Stack: automatic duration, LIFO\n- Heap: dynamic with new/delete (or smart pointers)\n- RAII: Resources acquired in constructor, released in destructor\n\n**Smart Pointers:**\n- unique_ptr: sole ownership, auto-frees\n- shared_ptr: ref-counted shared ownership\n- weak_ptr: non-owning, breaks cycles\n\n**Templates:** Compile-time generics. Template metaprogramming (TMP) for zero-cost abstractions.\n\n**Move Semantics (C++11):** Move constructor + move assignment. rvalue references (&&). std::move transfers ownership without copying.\n\n**Virtual Functions:** Dynamic dispatch via vtable (pointer to function table). Virtual destructor essential for polymorphic base classes.\n\n**STL Containers:**\n- vector: dynamic array, O(1) access\n- map: Red-Black tree, O(log n)\n- unordered_map: hash table, O(1) avg`
+    },
+    { id:"go", name:"Go", icon:"🐹", type:"backend", category:["systems","web"], tagline:"Google's secret weapon for scalable services", accent:"#00ADD8", tags:["Compiled","Statically Typed","Concurrent","Simple"], desc:"Designed at Google for simplicity and extreme concurrency. Powers Docker, Kubernetes, and high-scale APIs.", overview:"Robert Griesemer, Rob Pike, Ken Thompson at Google (2009). Emphasis on simplicity, fast compilation, built-in concurrency with goroutines.", uses:["Cloud Infrastructure","Microservices","CLI Tools","DevOps/SRE","High-throughput APIs","Network Services"], syntax:`package main\nimport "fmt"\n\n// Goroutines + Channels\nfunc producer(ch chan<- int) {\n    for i := 0; i < 5; i++ {\n        ch <- i\n    }\n    close(ch)\n}\n\nfunc main() {\n    ch := make(chan int)\n    go producer(ch)\n    for v := range ch {\n        fmt.Println(v)\n    }\n}`, ecosystem:["Gin","Echo","gRPC","Docker","Kubernetes","etcd","Prometheus"], salary:"₹12L–₹50L+", topCompanies:["Google","Uber","Cloudflare","Zerodha","Razorpay"],
+      notes: `**Go Core Concepts:**\n\n**Goroutines:** Lightweight threads managed by Go runtime (~2KB stack vs ~8MB OS thread). Schedule via M:N threading.\n\n**Channels:** Typed conduits for communication between goroutines. "Don't communicate by sharing memory; share memory by communicating."\n\n**select Statement:** Like switch but for channels. Handles multiple channel operations, with optional default for non-blocking.\n\n**Interfaces:** Implicit implementation — no 'implements' keyword. Structural typing. The empty interface{} accepts anything.\n\n**Error Handling:** No exceptions. Functions return (value, error). Check error explicitly: if err != nil { ... }\n\n**defer:** Defers function execution until surrounding function returns. LIFO order. Great for cleanup.\n\n**Slices vs Arrays:** Arrays are value types (fixed size). Slices are references to arrays with length and capacity.\n\n**No Inheritance:** Composition via embedding structs. Interface-based polymorphism.`
+    },
+    { id:"rust", name:"Rust", icon:"🦀", type:"systems", category:["systems"], tagline:"Memory safety without garbage collection", accent:"#CE412B", tags:["Compiled","Memory Safe","Systems","Zero-cost"], desc:"Mozilla's systems language — blazing fast with compile-time memory safety. No GC, no data races.", overview:"Graydon Hoare at Mozilla (2010). Ownership system enforces memory safety at compile time. Used in OS, browsers, WebAssembly, blockchain.", uses:["Systems Programming","WebAssembly","Embedded Systems","Game Development","Blockchain","Browser Engines"], syntax:`// Ownership & Borrowing\nfn main() {\n    let s1 = String::from("hello");\n    let s2 = &s1; // borrow\n    println!("{} {}", s1, s2);\n    \n    // Pattern Matching\n    let result: Result<i32, &str> = Ok(42);\n    match result {\n        Ok(n) => println!("Got: {}", n),\n        Err(e) => println!("Error: {}", e),\n    }\n}`, ecosystem:["Tokio","Actix","Serde","Cargo","WebAssembly","Clap"], salary:"₹15L–₹60L+", topCompanies:["Mozilla","Discord","Cloudflare","Amazon","Microsoft"],
+      notes: `**Rust Core Concepts:**\n\n**Ownership Rules:**\n1. Each value has one owner\n2. Only one owner at a time\n3. When owner goes out of scope, value is dropped\n\n**Borrowing:** References (&) borrow without taking ownership. Rules:\n- Many immutable references OR one mutable reference\n- References must always be valid (no dangling refs)\n\n**Lifetimes:** Annotations ('a) that express how long references are valid. Usually inferred by compiler.\n\n**Option<T> and Result<T,E>:** No null — use Option::None. No exceptions — use Result::Err. Forces you to handle all cases.\n\n**Traits:** Like interfaces. Define shared behavior. impl Trait for Type. Trait objects: Box<dyn Trait> for dynamic dispatch.\n\n**Pattern Matching:** match is exhaustive — compiler ensures all cases handled. Destructure enums, tuples, structs.\n\n**Zero-cost Abstractions:** Iterators, closures, generics compile to the same code as hand-written loops.`
+    },
+    { id:"typescript", name:"TypeScript", icon:"🔷", type:"web", category:["web"], tagline:"JavaScript with superpowers — typed & safe", accent:"#3178C6", tags:["Transpiled","Statically Typed","OOP","Full Stack"], desc:"Microsoft's typed superset of JS. Catches bugs at compile time and enables large-scale application development.", overview:"Anders Hejlsberg at Microsoft (2012). Superset of JavaScript adding static types, interfaces, generics, and more. Compiles to plain JS.", uses:["Large-scale Frontend","Full-stack with Node.js","Angular/React apps","API Development","Library Development","Enterprise Frontend"], syntax:`// Interfaces & Generics\ninterface Developer {\n  name: string;\n  skills: string[];\n  salary?: number;\n}\n\nfunction getTop<T extends { name: string }>(items: T[]): T {\n  return items[0];\n}\n\n// Union Types\ntype Status = 'loading' | 'success' | 'error';\n\nasync function fetchUser(id: number): Promise<Developer | null> {\n  // ...\n}`, ecosystem:["React","Angular","NestJS","Prisma","tRPC","Zod","Vitest"], salary:"₹6L–₹40L+", topCompanies:["Microsoft","Airbnb","Slack","Asana","Notion"],
+      notes: `**TypeScript Core Concepts:**\n\n**Type System:**\n- Structural typing (shape-based, not name-based)\n- Type inference: TS infers types from assignment\n- Strict mode: enables strictNullChecks, noImplicitAny, etc.\n\n**Key Types:**\n- Primitives: string, number, boolean, null, undefined, symbol\n- Object: interface or type alias\n- Union: string | number\n- Intersection: TypeA & TypeB\n- Generic: Array<T>, Promise<T>\n- Utility types: Partial<T>, Required<T>, Pick<T,K>, Omit<T,K>\n\n**Type Guards:** Narrow types in conditionals:\n- typeof, instanceof\n- Custom: function isString(x): x is string\n\n**Generics:** Write reusable code that works with multiple types. Constrain with extends.\n\n**Enums:** Named constants. const enum for performance (inlined).\n\n**Declaration Files (.d.ts):** Type definitions for JS libraries.`
+    },
+    { id:"sql", name:"SQL", icon:"🗄️", type:"data", category:["data","web"], tagline:"The universal language of data", accent:"#336791", tags:["Declarative","Relational","ACID","Query Language"], desc:"Still the most important data skill. Every backend, every data role requires SQL fluency.", overview:"Structured Query Language. Standardized in 1986. Manages relational databases. Every serious application uses SQL at its core.", uses:["Database Design & Management","Backend Development","Data Analysis","Reporting & BI","ETL Pipelines","Data Engineering"], syntax:`-- Complex Query with Window Functions\nSELECT \n    emp_id,\n    name,\n    salary,\n    department,\n    RANK() OVER (PARTITION BY department ORDER BY salary DESC) as dept_rank,\n    AVG(salary) OVER (PARTITION BY department) as dept_avg,\n    salary - LAG(salary) OVER (ORDER BY emp_id) as salary_diff\nFROM employees\nWHERE department IN ('Engineering', 'Data')\nHAVING dept_rank <= 3;`, ecosystem:["PostgreSQL","MySQL","SQLite","Snowflake","BigQuery","dbt","Pandas"], salary:"₹4L–₹30L+ (data roles higher)", topCompanies:["Every company!","Flipkart","Amazon","Google","Zerodha"],
+      notes: `**SQL Core Concepts:**\n\n**Joins:**\n- INNER JOIN: Only matching rows from both tables\n- LEFT JOIN: All left rows + matching right rows (NULL if no match)\n- RIGHT JOIN: All right rows + matching left\n- FULL OUTER JOIN: All rows from both tables\n- CROSS JOIN: Cartesian product\n- SELF JOIN: Table joins itself (e.g., employee-manager)\n\n**Indexes:**\n- B-tree (default): Good for range queries, equality\n- Hash: Only equality\n- Composite: Multiple columns (order matters!)\n- Covering index: Includes all query columns\n\n**Window Functions:** Operate over a "window" of rows without collapsing them. ROW_NUMBER(), RANK(), DENSE_RANK(), LAG(), LEAD(), SUM() OVER().\n\n**ACID Properties:**\n- Atomicity: All or nothing\n- Consistency: Valid state transitions only\n- Isolation: Transactions don't see each other's partial work\n- Durability: Committed data survives crashes\n\n**Normalization:**\n- 1NF: Atomic values, no repeating groups\n- 2NF: No partial dependency on composite key\n- 3NF: No transitive dependency`
+    }
+  ],
+
+  roadmap: [
+    { level:"L1", salary:"₹3L–₹8L", title:"Fresher / Junior Dev", desc:"First job. Learning fast. Core CS fundamentals and one language mastery.", color:"#00ff88", duration:"0–1 year experience", skills:["1 Language","Basic DSA","Git","HTML/CSS/SQL","REST APIs"], actions:["Solve 100+ LeetCode Easy/Medium","Build 3 portfolio projects","Deploy to Heroku/Vercel","Apply to Zoho, Freshworks, TCS","Contribute to 1 open source repo"] },
+    { level:"L2", salary:"₹8L–₹18L", title:"Software Engineer II", desc:"Solid fundamentals. Feature ownership. Code reviews. System awareness.", color:"#00f5ff", duration:"1–3 years experience", skills:["2+ Languages","Trees/Graphs","Docker basics","CI/CD","System Design basics"], actions:["Solve 200+ LeetCode (incl. Mediums)","Lead a feature end-to-end","Learn Docker + basics of cloud","Target: Unicorns, mid-stage startups","Study System Design vol. 1 (Alex Xu)"] },
+    { level:"L3", salary:"₹18L–₹30L", title:"Senior Engineer / SDE-2", desc:"System design ownership. Mentorship. Cross-team impact. Technical leadership.", color:"#a855f7", duration:"3–5 years experience", skills:["Distributed Systems","Advanced DSA","Cloud (AWS/GCP)","Microservices","Leadership"], actions:["Crack FAANG-level DSA (300+ problems)","Design a scalable system solo","Mentor 2+ junior engineers","Target: FAANG, Google, Amazon","Study DDIA book cover to cover"] },
+    { level:"L4", salary:"₹30L–₹50L", title:"Staff / Principal Engineer", desc:"Org-level technical strategy. Multiple teams. Architecture decisions.", color:"#ff6b35", duration:"5–8 years experience", skills:["System Architecture","ML/AI basics","Cost Optimization","OKR planning","Stakeholder Management"], actions:["Own platform-level architecture","Drive 0→1 product initiatives","Build thought leadership (blog/talks)","Target: Google L5, Meta E5","Contribute to open source at scale"] },
+    { level:"L5", salary:"₹50L–₹1Cr+", title:"Distinguished / VP Eng", desc:"Company-level technical vision. Builds teams. Drives external reputation.", color:"#ffd700", duration:"8+ years experience", skills:["Executive Communication","Team Building","Product Vision","External Tech Influence","M&A Technical DD"], actions:["Lead 20+ engineer organizations","Drive IPO/Series C technical due diligence","Keynote at conferences","Patents or major open source impact","Join advisory boards"] }
+  ],
+
+  dsa: {
+    ds: [
+      { id:"arrays", title:"Arrays & Strings", difficulty:"easy", desc:"Foundation of all data structures. Contiguous memory, O(1) random access, O(n) insertion/deletion.", topics:["Two-pointer technique","Sliding window","Prefix sums","Kadane's algorithm (max subarray)","Boyer-Moore voting (majority element)","Dutch national flag algorithm"], notes:`**Arrays — The Foundation**\n\nAn array stores elements at contiguous memory locations. The key insight: because memory is contiguous, you can compute the address of any element directly: address = base + (index × element_size). This gives O(1) random access.\n\n**Time Complexities:**\n- Access: O(1)\n- Search (unsorted): O(n)\n- Search (sorted, binary): O(log n)\n- Insertion at end: O(1) amortized\n- Insertion at middle: O(n) — must shift\n- Deletion: O(n) — must shift\n\n**Two Pointer Pattern:** Use two indices moving toward each other (sorted array problems) or same direction (fast/slow). Reduces O(n²) to O(n).\n\n**Sliding Window:** Maintain a window [l, r] and expand/shrink. Great for "max subarray of size k" style problems.\n\n**Prefix Sum:** preSum[i] = sum(0..i). Query sum(l..r) = preSum[r] - preSum[l-1] in O(1) after O(n) preprocessing.`, practice:[{num:"#1",title:"Two Sum",diff:"easy",desc:"Given an array of integers nums and target, return indices of two numbers that add up to target.",example:"Input: nums=[2,7,11,15], target=9\nOutput: [0,1]  // nums[0]+nums[1]=2+7=9",hint:"Use a HashMap to store each number and its index. For each element, check if (target - element) exists in the map.",solution:"HashMap approach: iterate once, for each num check if (target-num) is in map. If yes, return. Else store num→index in map. O(n) time, O(n) space.",explain:"The naive O(n²) approach checks every pair. The insight: for each number x, you need to know if (target-x) exists — and a HashMap gives you O(1) lookup."},{num:"#53",title:"Maximum Subarray",diff:"easy",desc:"Find the contiguous subarray with the largest sum.",example:"Input: [-2,1,-3,4,-1,2,1,-5,4]\nOutput: 6  // [4,-1,2,1]",hint:"Kadane's Algorithm: keep a running sum. If it goes negative, restart from current element.",solution:"maxSum = currentSum = nums[0]. For each num: currentSum = max(num, currentSum + num). maxSum = max(maxSum, currentSum). O(n).",explain:"Key insight: if adding the previous subarray makes things worse (currentSum < 0), it's better to start fresh from the current element."}]},
+      { id:"linked-lists", title:"Linked Lists", difficulty:"easy", desc:"Dynamic data structure with nodes pointing to next. O(1) insert/delete at known position, O(n) search.", topics:["Singly vs Doubly linked","Floyd's cycle detection","Reverse a linked list","Merge sorted lists","Find middle node","LRU Cache implementation"], notes:`**Linked Lists — Dynamic Chaining**\n\nUnlike arrays, linked list elements are NOT contiguous. Each node contains data + a pointer to the next node. You trade O(1) random access for O(1) insertion/deletion at a known position.\n\n**Singly vs Doubly:**\n- Singly: node has next pointer only. Less memory.\n- Doubly: node has next AND prev. O(1) backward traversal. Used in LRU cache, browsers (back/forward).\n\n**Floyd's Cycle Detection:** Two pointers — slow (1 step), fast (2 steps). If they meet, there's a cycle. To find entry point: reset slow to head, advance both 1 step at a time until they meet again.\n\n**Reverse a Linked List:**\n- Iterative: prev=null, curr=head. While curr: next=curr.next, curr.next=prev, prev=curr, curr=next. Return prev.\n- Recursive: reverse(head.next), then head.next.next=head, head.next=null\n\n**Common Mistakes:**\n- Not checking null before accessing .next\n- Losing reference to nodes during rewiring\n- Off-by-one in k-th node problems`, practice:[{num:"#206",title:"Reverse Linked List",diff:"easy",desc:"Reverse a singly linked list iteratively or recursively.",example:"Input: 1→2→3→4→5\nOutput: 5→4→3→2→1",hint:"Use 3 pointers: prev (null), curr (head), next. At each step, save next, point curr to prev, advance both.",solution:"prev=null, curr=head. While curr: nextTemp=curr.next, curr.next=prev, prev=curr, curr=nextTemp. Return prev.",explain:"We're reversing the direction of each pointer. We need 3 pointers because when we change curr.next, we lose the original next node — so we save it first."}]},
+      { id:"trees", title:"Trees & Binary Trees", difficulty:"medium", desc:"Hierarchical structures. BST gives O(log n) search. Balanced trees (AVL, Red-Black) guarantee O(log n) worst case.", topics:["DFS: Inorder/Preorder/Postorder","BFS (Level Order)","Binary Search Tree operations","Lowest Common Ancestor","Serialize/Deserialize","Trie (Prefix Tree)"], notes:`**Trees — Hierarchical Structures**\n\nA tree is a connected, acyclic graph. Binary tree: each node has at most 2 children (left, right).\n\n**BST Property:** For every node, left subtree values < node value < right subtree values. This allows O(log n) search IF balanced.\n\n**Tree Traversals:**\n- Inorder (L-Root-R): Gives sorted output for BST\n- Preorder (Root-L-R): Used for cloning/serializing\n- Postorder (L-R-Root): Used for deletion, evaluation\n- Level Order (BFS): Use a queue, process level by level\n\n**Height vs Depth:** Height = edges to leaf (from node). Depth = edges from root (to node). Height of tree = height of root.\n\n**Balanced BSTs:**\n- AVL Tree: |height(left) - height(right)| ≤ 1 for all nodes\n- Red-Black Tree: Used in Java TreeMap, Linux scheduler\n\n**Trie:** Prefix tree for strings. Each node = one character. Used for autocomplete, spell check, word search.\n\n**Common Patterns:**\n- Recursion: "solve for subtree, combine"\n- Parent-left-right decomposition\n- Two-pointer on tree paths`, practice:[{num:"#104",title:"Maximum Depth of Binary Tree",diff:"easy",desc:"Return the maximum depth (number of nodes along the longest path from root to leaf).",example:"Input: [3,9,20,null,null,15,7]\nOutput: 3",hint:"Base case: null node has depth 0. For any node: depth = 1 + max(depth(left), depth(right)).",solution:"def maxDepth(root): return 0 if not root else 1 + max(maxDepth(root.left), maxDepth(root.right))",explain:"Classic recursion. The depth of a tree = 1 (current node) + the deeper of its two subtrees. This naturally handles leaves (both children null → max(0,0) = 0)."}]},
+      { id:"graphs", title:"Graphs", difficulty:"hard", desc:"Most general data structure. Vertices + edges. Directed/undirected. Cyclic/acyclic. Weighted/unweighted.", topics:["BFS (shortest path in unweighted)","DFS (cycle detection, topo sort)","Dijkstra's algorithm","Union-Find (DSU)","Topological Sort","Bellman-Ford / Floyd-Warshall"], notes:`**Graphs — The General Structure**\n\nGraph G = (V, E). V = vertices (nodes), E = edges (connections). Every tree is a graph, but not every graph is a tree.\n\n**Representations:**\n- Adjacency List: array of lists. Space O(V+E). Good for sparse graphs.\n- Adjacency Matrix: V×V matrix. Space O(V²). O(1) edge lookup. Good for dense graphs.\n\n**BFS — Breadth First Search:**\nUse a queue. Visit all neighbors before going deeper. Finds shortest path in unweighted graph. Time O(V+E).\n\n**DFS — Depth First Search:**\nUse a stack (or recursion). Go as deep as possible before backtracking. Used for: cycle detection, topological sort, connected components, path finding. Time O(V+E).\n\n**Dijkstra's Algorithm:**\nShortest path in weighted graph (non-negative weights). Use a min-heap (priority queue). Time O((V+E) log V).\n\n**Union-Find (DSU):**\nEfficiently answers: "are nodes X and Y connected?" find() with path compression. union() by rank. Nearly O(1) amortized.\n\n**Topological Sort:**\nLinear ordering of vertices such that for every edge (u,v), u comes before v. Only possible in DAG (Directed Acyclic Graph). Uses DFS or Kahn's algorithm (BFS with in-degree counting).`, practice:[{num:"#207",title:"Course Schedule",diff:"medium",desc:"Given n courses and prerequisites, determine if you can finish all courses (detect cycle in directed graph).",example:"Input: numCourses=2, prerequisites=[[1,0]]\nOutput: true  // Take 0 then 1",hint:"Build a directed graph. If there's a cycle, you can't finish all courses. Use DFS with 3-color marking: 0=unvisited, 1=visiting, 2=done.",solution:"Build adjacency list. DFS each unvisited node. If you reach a 'visiting' node, cycle exists → return false. Mark as 'done' after all neighbors processed.",explain:"A cycle means course A requires B which requires A — impossible. The 3-color DFS catches cycles: if we're currently visiting a node and encounter it again, we've found a cycle."}]}
+    ],
+    algo: [
+      { id:"sorting", title:"Sorting Algorithms", difficulty:"easy", desc:"Foundation algorithms every developer must know cold. Interview staple — be ready to implement from scratch.", topics:["Bubble, Selection, Insertion — O(n²)","Merge Sort — O(n log n) stable","Quick Sort — O(n log n) avg","Heap Sort — O(n log n) in-place","Counting/Radix — O(n) special cases","When to use which?"], notes:`**Sorting — The Complete Guide**\n\n**Comparison-Based Lower Bound:** Any comparison sort is Ω(n log n) — provable via decision tree argument.\n\n**Merge Sort:**\nDivide array in half, recursively sort each half, merge. STABLE, O(n log n) always. Extra O(n) space. Best for linked lists, external sort.\n\n**Quick Sort:**\nChoose pivot, partition (elements < pivot left, > right), recurse. O(n log n) average, O(n²) worst (bad pivot). In-place. NOT stable. Most practical — good cache behavior.\n\n**Heap Sort:**\nBuild max-heap, repeatedly extract max. O(n log n) always, O(1) extra space. NOT stable. Slower in practice due to poor cache behavior.\n\n**Counting Sort:** Count occurrences of each value. Only works for small integer range. O(n+k) time.\n\n**When to use what:**\n- Need stability + guaranteed O(n log n)? → Merge Sort\n- General purpose, fast in practice? → Quick Sort (or Tim Sort)\n- O(1) extra space? → Heap Sort or Quick Sort\n- Small integer keys? → Counting Sort`, practice:[{num:"#912",title:"Sort an Array",diff:"medium",desc:"Sort an array of integers. Implement merge sort or quicksort from scratch.",example:"Input: [5,2,3,1]\nOutput: [1,2,3,5]",hint:"Implement merge sort: split into two halves, sort each, then merge by comparing front elements.",solution:"mergeSort(arr): if len<=1 return. mid=len//2. left=mergeSort(arr[:mid]), right=mergeSort(arr[mid:]). Then merge two sorted arrays.",explain:"Merge sort's key insight: merging two sorted arrays is O(n). Recursively splitting gives us log n levels. Total: O(n log n)."}]},
+      { id:"binary-search", title:"Binary Search", difficulty:"easy", desc:"Divide and conquer on sorted data. O(log n) search. Many non-obvious applications.", topics:["Classic binary search","Search in rotated array","Find first/last occurrence","Binary search on answer space","Square root (Newton's method)","Kth element in two sorted arrays"], notes:`**Binary Search — Beyond Simple Search**\n\nBinary search works on ANY monotonic function, not just arrays. If you can say "all values satisfying condition X are on the left, not satisfying are on the right", you can binary search.\n\n**Template (always use this to avoid off-by-one errors):**\n\nlo, hi = 0, len(arr) - 1\nwhile lo <= hi:\n    mid = lo + (hi - lo) // 2  # Avoid overflow!\n    if arr[mid] == target: return mid\n    elif arr[mid] < target: lo = mid + 1\n    else: hi = mid - 1\nreturn -1\n\n**Common Variants:**\n- Find leftmost occurrence: when found, set hi = mid - 1 (keep going left)\n- Find rightmost: when found, set lo = mid + 1\n- Search on answer: binary search on the answer value, validate with a helper function\n\n**Rotated Array Trick:** One half is always sorted. Check which half, then decide which side to search.\n\n**Time: O(log n) — cuts search space in half each iteration.**`, practice:[{num:"#33",title:"Search in Rotated Sorted Array",diff:"medium",desc:"An array was rotated at some pivot. Find target's index, or -1 if not found.",example:"Input: nums=[4,5,6,7,0,1,2], target=0\nOutput: 4",hint:"One half of the array is always sorted. Check if left half is sorted (nums[lo]<=nums[mid]). If target in that range, search left. Else search right.",solution:"While lo<=hi: mid=(lo+hi)//2. Check if nums[lo]<=nums[mid] (left sorted). If so, check if target in [lo,mid], search left or right accordingly.",explain:"Even after rotation, at least one half is always sorted. We check which half is sorted and whether our target could be in that sorted half."}]},
+      { id:"dp", title:"Dynamic Programming", difficulty:"hard", desc:"Optimization technique: break into overlapping subproblems, cache results. Master this for FAANG.", topics:["Memoization (top-down)","Tabulation (bottom-up)","0/1 Knapsack","Longest Common Subsequence","Longest Increasing Subsequence","Matrix Chain Multiplication","Coin Change / Unbounded Knapsack"], notes:`**Dynamic Programming — The FAANG Killer**\n\n**Two conditions for DP:**\n1. Optimal Substructure: optimal solution built from optimal sub-solutions\n2. Overlapping Subproblems: same subproblems solved multiple times\n\n**Approaches:**\n- Top-down (Memoization): Start with original problem, recurse, cache results in a map/array. Natural, easier to write.\n- Bottom-up (Tabulation): Fill table from smallest to largest subproblem. Better space efficiency.\n\n**DP Framework (think in 3 steps):**\n1. State definition: what does dp[i] or dp[i][j] represent?\n2. Transition: how to compute dp[i] from smaller states?\n3. Base cases: smallest subproblem values\n\n**Classic Problems Pattern:**\n- Coin Change: dp[amount] = min coins to make amount\n- 0/1 Knapsack: dp[i][w] = max value with first i items, weight limit w\n- LCS: dp[i][j] = LCS of first i chars of s1, first j chars of s2\n- LIS: dp[i] = length of LIS ending at index i\n\n**Space Optimization:** Many 2D DP can be reduced to 1D by observing that dp[i][j] only depends on dp[i-1][...]`, practice:[{num:"#322",title:"Coin Change",diff:"medium",desc:"Given coins of different denominations and an amount, find minimum number of coins to make that amount.",example:"Input: coins=[1,5,11], amount=15\nOutput: 3  // 5+5+5 (NOT 11+1+1+1+1=5!)",hint:"dp[amount] = min coins to make that amount. For each amount a from 1 to target: dp[a] = 1 + min(dp[a-coin] for coin in coins if a>=coin).",solution:"dp = [inf]*(amount+1), dp[0]=0. For a in range(1,amount+1): for coin in coins: if a>=coin: dp[a]=min(dp[a], 1+dp[a-coin]). Return dp[amount] if not inf else -1.",explain:"Key insight: to make amount a, we try using each coin. If we use coin c, we need to make (a-c) optimally. dp[a-c] gives us that optimal answer. We take the minimum over all valid coins."}]}
+    ],
+    patterns: [
+      { id:"two-pointer", title:"Two Pointer", difficulty:"easy", desc:"Two indices scanning the array — often eliminates need for nested loops. Many O(n) solutions where O(n²) seems natural.", topics:["Opposite ends (sorted array)","Same direction (fast/slow)","Partition-based problems","Container with most water","3Sum / 4Sum","Trapping rain water"], notes:`**Two Pointer Pattern — Eliminate Brute Force**\n\nUsed when you have a sorted array and need pairs/triplets satisfying some condition. Instead of nested loops O(n²), use two pointers moving toward each other O(n).\n\n**Pattern 1: Opposite Ends**\nLeft pointer at start, right at end. Move based on comparison:\n- If sum == target: found!\n- If sum < target: move left pointer right (increase sum)\n- If sum > target: move right pointer left (decrease sum)\n\n**Pattern 2: Fast/Slow (Floyd's)**\nUsed for cycle detection, finding middle of list, removing duplicates in-place.\n\n**Pattern 3: Sliding Window**\nA special case of two pointers where the window expands and contracts. Used for subarray/substring problems.\n\n**Key Insight:** Works because the array is sorted (or can be sorted). When you move a pointer, you're making a DECISION — you're guaranteeing the discarded option can never be part of the answer.\n\n**Time: O(n), Space: O(1)**`, practice:[{num:"#15",title:"3Sum",diff:"medium",desc:"Find all unique triplets in array that sum to zero.",example:"Input: [-1,0,1,2,-1,-4]\nOutput: [[-1,-1,2],[-1,0,1]]",hint:"Sort the array. Fix one element, then use two pointers on the remaining subarray. Skip duplicates carefully.",solution:"Sort arr. For i in range(n-2): skip if duplicate. lo=i+1, hi=n-1. While lo<hi: if sum==0: add, skip dupes, shrink window. Else adjust pointers.",explain:"After sorting, we fix nums[i] and need two numbers summing to -nums[i]. Two pointers on sorted subarray finds all such pairs in O(n). Total O(n²) beats brute force O(n³)."}]},
+      { id:"sliding-window", title:"Sliding Window", difficulty:"medium", desc:"Maintain a window over sequential data. Expand and shrink to satisfy constraints. Key pattern for subarray/substring problems.", topics:["Fixed-size window (max sum of k elements)","Variable-size window (longest valid subarray)","At most K distinct characters","Minimum window substring","Maximum sliding window (monotonic deque)","Fruit into baskets"], notes:`**Sliding Window — The Substring Master**\n\nMaintain a "window" defined by [left, right] pointers. The window slides right as we process elements. We expand (move right) greedily and shrink (move left) when constraints are violated.\n\n**Template:**\nleft = 0, result = 0\nfor right in range(len(arr)):\n    # 1. ADD arr[right] to window state\n    \n    # 2. SHRINK while window invalid\n    while window_invalid:\n        # remove arr[left] from state\n        left += 1\n    \n    # 3. UPDATE result (window is now valid)\n    result = max(result, right - left + 1)\n\n**Fixed Window:** Slide a window of exact size k. At each step, add rightmost, remove leftmost.\n\n**Variable Window:** Expand freely, shrink when invalid. The hard part is knowing WHEN to shrink.\n\n**State Tracking:** Usually a HashMap (frequency count) or two frequency counters. Track what makes the window valid/invalid.\n\n**Time: O(n) — each element added and removed at most once.**`, practice:[{num:"#3",title:"Longest Substring Without Repeating Characters",diff:"medium",desc:"Find the length of the longest substring without repeating characters.",example:"Input: 'abcabcbb'\nOutput: 3  // 'abc'",hint:"Use a sliding window with a HashMap to track character positions. When you see a repeat, move left pointer to skip past the previous occurrence.",solution:"charIndex={}, left=0, maxLen=0. For right,char in enumerate(s): if char in charIndex and charIndex[char]>=left: left=charIndex[char]+1. charIndex[char]=right. maxLen=max(maxLen, right-left+1).",explain:"We keep a window of unique characters. When we encounter a duplicate at position right, we shrink the window by moving left past the previous occurrence of that character."}]},
+      { id:"backtracking", title:"Backtracking", difficulty:"hard", desc:"Systematically search all possibilities. Build solutions incrementally, abandon (backtrack) as soon as a constraint is violated.", topics:["N-Queens problem","Sudoku solver","Generate all permutations","Generate all subsets","Word search in grid","Combination sum"], notes:`**Backtracking — Systematic Exhaustive Search**\n\nBacktracking is a refined brute force. Build solutions incrementally. If at any point the current partial solution violates constraints, abandon it and try the next option.\n\n**Template:**\ndef backtrack(state, choices):\n    if is_solution(state):\n        result.append(state.copy())\n        return\n    \n    for choice in choices:\n        if is_valid(state, choice):\n            make_choice(state, choice)\n            backtrack(state, remaining_choices)\n            undo_choice(state, choice)  # BACKTRACK\n\n**Key Insight:** The "undo" step is critical. You must restore state exactly as it was before the choice.\n\n**Pruning:** The power of backtracking is in pruning — cutting off branches early when we KNOW they can't lead to a valid solution.\n\n**Permutations vs Combinations:**\n- Permutations: order matters, use "used" set to avoid reuse\n- Combinations: order doesn't matter, only consider choices ≥ current index\n- Subsets: include/exclude each element\n\n**Time complexity:** Usually O(b^d) where b=branching factor, d=depth. With pruning, often much better in practice.`, practice:[{num:"#46",title:"Permutations",diff:"medium",desc:"Given an array of distinct integers, return all possible permutations.",example:"Input: [1,2,3]\nOutput: [[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]",hint:"Use backtracking with a 'used' boolean array. At each position, try each unused number.",solution:"def backtrack(path, used): if len(path)==n: result.append(path[:]); return. For i in range(n): if not used[i]: used[i]=True, path.append(nums[i]), backtrack, path.pop(), used[i]=False.",explain:"At each step, we choose one of the remaining unused numbers. The 'used' array prevents us from using the same element twice. After recursing, we undo our choice (backtrack) to explore other possibilities."}]}
+    ]
+  },
+
+  companies: [
+    { name:"Google", logo:"🔍", type:"FAANG", color:"#4285F4", salary:"₹25L – ₹1Cr+", focus:"Hardest DSA interviews. Strong emphasis on algorithms, system design, and Googleyness. L4 fresher salary ~₹40-50L.", tags:["SDE","SRE","ML","Data","TPM"] },
+    { name:"Microsoft", logo:"🪟", type:"FAANG", color:"#00A4EF", salary:"₹20L – ₹80L+", focus:"Balanced DSA + system design + behavioral. Azure cloud a big plus. Values growth mindset.", tags:["SDE","Cloud","DevOps","PM","Research"] },
+    { name:"Amazon", logo:"📦", type:"FAANG", color:"#FF9900", salary:"₹20L – ₹70L+", focus:"Leadership Principles are REAL. Behavioral round as important as technical. Strong DSA + scalable systems.", tags:["SDE","SRE","Data","ML","Operations"] },
+    { name:"Flipkart", logo:"🛒", type:"Unicorn", color:"#2874F0", salary:"₹20L – ₹65L+", focus:"System design at scale (200M+ users). Strong algorithms, Java ecosystem, micro-services.", tags:["Backend","Frontend","Data","ML","DevOps"] },
+    { name:"Razorpay", logo:"💳", type:"Unicorn", color:"#0D6EFD", salary:"₹18L – ₹60L+", focus:"Payments infra, high reliability systems, Go/Java, distributed systems, security.", tags:["Backend","Platform","Security","Data","SRE"] },
+    { name:"CRED", logo:"💜", type:"Unicorn", color:"#8B5CF6", salary:"₹20L – ₹60L+", focus:"High-quality eng culture. Strong emphasis on product thinking + system design + DSA.", tags:["Backend","iOS","Android","Data","Platform"] },
+    { name:"Zerodha", logo:"📈", type:"Fintech", color:"#387ED1", salary:"₹15L – ₹45L+", focus:"High-frequency trading systems, low-latency, Go/Python, financial data.", tags:["Backend","Go","Python","Trading","Platform"] },
+    { name:"Goldman Sachs", logo:"🏦", type:"Finance", color:"#7399C6", salary:"₹20L – ₹60L+", focus:"Strong DSA, systems programming, finance domain knowledge, risk management.", tags:["SDE","Quant","C++","Risk","Trading"] },
+    { name:"Freshworks", logo:"🍀", type:"SaaS", color:"#2C5F2E", salary:"₹10L – ₹40L+", focus:"SaaS products, B2B engineering, multi-tenant architecture.", tags:["SDE","Frontend","Backend","DevOps","CRM"] },
+    { name:"Zoho", logo:"🔩", type:"SaaS", color:"#FF6835", salary:"₹5L – ₹25L+", focus:"Good for freshers. Wide product range. Training provided. Values long-term commitment.", tags:["SDE","Frontend","Backend","QA","DevOps"] }
+  ],
+
+  hackathons: [
+    { name:"Smart India Hackathon (SIH)", icon:"🇮🇳", org:"Govt. of India / AICTE", type:"india", prize:"₹1L – ₹5L per team", desc:"World's biggest hackathon. Problem statements from central government ministries." },
+    { name:"HackWithInfy", icon:"🔵", org:"Infosys", type:"india", prize:"Cash prizes + PPO opportunity", desc:"Infosys annual coding challenge. Winners get Pre-Placement Offers." },
+    { name:"Flipkart Grid", icon:"🛒", org:"Flipkart", type:"india", prize:"Internship + ₹1L+ prizes", desc:"Annual engineering challenge across software engineering, ML, and UI/UX tracks." },
+    { name:"ETHIndia", icon:"⛓️", org:"ETHIndia / Devfolio", type:"india", prize:"$100K+ in bounties", desc:"India's largest Ethereum hackathon. Top Web3 event with massive sponsor prize pool." },
+    { name:"HackON with Amazon", icon:"📦", org:"Amazon India", type:"india", prize:"Internship + Cash prizes", desc:"Amazon's flagship hackathon. Real-world AWS problem statements. Great for cloud + backend." },
+    { name:"Google Code Jam", icon:"🌐", org:"Google", type:"global", prize:"Up to $15,000 USD", desc:"Google's premier competitive programming contest. Algorithm-heavy. World Finalists compete in person." },
+    { name:"Microsoft Imagine Cup", icon:"💻", org:"Microsoft", type:"global", prize:"$100,000 USD + Azure credits", desc:"Global student competition with world finals. Covers AI, sustainability, and gaming." },
+    { name:"HackMIT", icon:"🎩", org:"MIT Students", type:"global", prize:"$30K+ in prizes", desc:"One of the most prestigious student hackathons globally. 1000+ hackers, 36 hours." }
+  ],
+
+  interviews: {
+    technical: [
+      { id:"oop", title:"OOP Concepts", difficulty:"easy", questions:["Explain the 4 pillars of OOP","What is polymorphism? Types?","Difference between abstract class and interface","What is method overloading vs overriding?","Explain SOLID principles with examples","What is composition over inheritance?"], notes:`**OOP — The Complete Guide**\n\n**4 Pillars:**\n1. **Encapsulation:** Bundle data + methods together. Hide implementation via private/protected. Expose only what's needed. "Need to know basis."\n2. **Abstraction:** Hide complexity, show only essential features. Abstract classes and interfaces are tools for abstraction.\n3. **Inheritance:** Child class inherits properties/methods from parent. Promotes code reuse. "Is-A" relationship.\n4. **Polymorphism:** One interface, multiple implementations. Runtime (method overriding) and compile-time (overloading).\n\n**SOLID Principles:**\n- S: Single Responsibility — one class, one reason to change\n- O: Open/Closed — open for extension, closed for modification\n- L: Liskov Substitution — subclasses must be substitutable for base class\n- I: Interface Segregation — many specific interfaces > one general interface\n- D: Dependency Inversion — depend on abstractions, not concretions\n\n**Interview Trap:** "Favour composition over inheritance" — why? Composition is more flexible (change at runtime), avoids deep inheritance hierarchies, avoids fragile base class problem.` },
+      { id:"db", title:"Database Design", difficulty:"medium", questions:["ACID properties with examples","Explain database indexing and types","When to use SQL vs NoSQL?","What is database normalization (1NF-3NF)?","Explain optimistic vs pessimistic locking","How to design a rate limiter schema?"], notes:`**Database Design — Interview Essentials**\n\n**ACID:**\n- Atomicity: Transaction = all or nothing. Bank transfer: debit AND credit, or neither.\n- Consistency: DB goes from one valid state to another. Foreign key constraints, CHECK constraints.\n- Isolation: Concurrent transactions don't see each other's intermediate state. Levels: Read Uncommitted → Read Committed → Repeatable Read → Serializable (strictest).\n- Durability: Committed transactions survive crashes. WAL (Write-Ahead Logging).\n\n**Indexes:**\nA data structure (usually B-tree) that speeds up data retrieval. Trade-off: faster reads, slower writes (index must be updated).\n- Composite index (a,b,c): only helps queries on (a), (a,b), (a,b,c) — not (b) or (c) alone\n- Covering index: contains all columns a query needs — no table lookup needed\n\n**SQL vs NoSQL:**\n- SQL: structured data, ACID, complex queries, joins, consistency critical (banking, ERP)\n- NoSQL Document (MongoDB): flexible schema, nested data, rapid iteration\n- NoSQL Key-Value (Redis): caching, sessions, extremely fast\n- NoSQL Columnar (Cassandra): time-series, write-heavy, massive scale\n- NoSQL Graph (Neo4j): highly connected data (social networks, recommendations)` }
+    ],
+    hr: [
+      { id:"intro", title:"Tell Me About Yourself", difficulty:"easy", questions:["How to craft a 2-minute professional pitch","Highlighting technical projects effectively","Connecting your background to the role","Demonstrating growth mindset"], notes:`**The 2-Minute Pitch Framework:**\n\nStructure: Present → Past → Future\n\n1. **Present:** Current role/status + key accomplishment\n2. **Past:** Relevant experience that led here\n3. **Future:** Why this role/company excites you\n\n**Example skeleton:**\n"I'm a final-year CSE student at [college] with a strong focus on backend development. I recently built [project] that [impact/metric]. Before that, I interned at [company] where I [specific achievement]. I'm particularly excited about this role because [specific reason aligned with company]..."\n\n**Do:**\n- Lead with something memorable/specific\n- Quantify achievements (users, performance gains, etc.)\n- Tailor to the company's domain\n- Keep it under 2 minutes\n\n**Don't:**\n- Read your resume chronologically\n- Start with "I was born in..."\n- Be vague ("I love coding")` },
+      { id:"star", title:"STAR Method for Behavioral", difficulty:"medium", questions:["Tell me about a time you failed","Describe handling a conflict with a colleague","Give an example of handling tight deadlines","Tell me about a time you showed initiative"], notes:`**STAR Method — Behavioral Interview Framework**\n\n**S — Situation:** Set the scene. Context. When, where, what was the challenge?\n**T — Task:** What was YOUR specific responsibility? What were you trying to accomplish?\n**A — Action:** What did YOU specifically do? Be specific. Use "I" not "we". Describe your thought process.\n**R — Result:** What happened? Quantify if possible. What did you learn?\n\n**Prepare 5-7 STAR stories that each demonstrate multiple competencies:**\n- A project you're proud of (leadership, technical skill)\n- A failure/mistake (growth mindset, resilience)\n- A conflict resolved (communication, empathy)\n- A time you went above and beyond (initiative)\n- Working with ambiguity (problem-solving, decision-making)\n\n**Common Mistake:** Spending 80% on Situation/Task, 15% on Action, 5% on Result. Interviewers care most about your ACTIONS and RESULTS.\n\n**Amazon's 16 Leadership Principles:** They literally score you against these. Key ones: Ownership, Dive Deep, Bias for Action, Customer Obsession.` }
+    ],
+    system: [
+      { id:"url-short", title:"Design URL Shortener", difficulty:"medium", questions:["Estimate QPS: 100M URLs/day = ~1160 writes/sec","Base62 encoding for short codes","Redis caching for read-heavy workload","Handle redirects with HTTP 301/302","Rate limiting per user IP"], notes:`**System Design: URL Shortener — Step by Step**\n\n**Step 1: Clarify Requirements**\n- 100M URLs shortened per day?\n- URL length? Expiry?\n- Custom short URLs?\n- Analytics needed?\n\n**Step 2: Capacity Estimation**\n- Write QPS: 100M/86400 ≈ 1160/sec\n- Read QPS: 10:1 ratio → ~11600/sec (reads >> writes)\n- Storage: 100M URLs × 500 bytes = 50GB/day\n\n**Step 3: API Design**\n- POST /shorten → returns shortUrl\n- GET /:shortCode → 301/302 redirect\n\n**Step 4: Short Code Generation**\n- Base62 (a-z A-Z 0-9): 7 chars = 62^7 ≈ 3.5 trillion URLs\n- Options: random UUID + hash, auto-increment ID + base62, distributed ID (Snowflake)\n\n**Step 5: Data Model**\n- Table: (shortCode PK, longUrl, createdAt, userId, expiresAt)\n- Index on shortCode for fast lookup\n\n**Step 6: Scale**\n- Cache: Redis for hot short codes (90%+ of reads hit cache)\n- DB: Single primary for writes, read replicas for reads\n- CDN for serving redirects at edge\n\n**301 vs 302:** 301 = permanent (browser caches, less server load, no analytics). 302 = temporary (every click hits your server, can track analytics).` }
+    ],
+    coding: [
+      { id:"arrays-coding", title:"Array Coding Problems", difficulty:"easy", questions:["Two Sum (LeetCode #1)","Best Time to Buy/Sell Stock (#121)","Maximum Subarray — Kadane's (#53)","Move Zeroes (#283)","Product of Array Except Self (#238)","Find Duplicate Number (#287)"], notes:`**Array Problems — Strategy Guide**\n\n**Two Sum Family:**\nIf you need to find pairs summing to target → HashMap. Store (value → index) as you iterate. O(n) time.\n\n**Subarray Problems:**\n- Fixed size k: sliding window, track sum\n- Variable size (max/min length): two pointers + condition\n- Max sum: Kadane's algorithm\n- All subarrays satisfying condition: prefix sum + HashMap\n\n**In-place Modification:**\n- Partition around value: Dutch national flag (three-way partition)\n- Remove duplicates: two pointers (slow writes when finds unique)\n- Rotate array: reverse tricks\n\n**Prefix Products (Product Except Self #238):**\nLeft pass: leftProduct[i] = product of all elements left of i.\nRight pass: multiply with running right product.\nNo division needed! O(n) time, O(1) extra space.\n\n**Meeting Rooms / Intervals:**\nSort by start time. Check if intervals overlap. Merge greedily.\n\n**Binary Search on sorted array:**\nAlways check: am I looking for leftmost? rightmost? nearest? Template varies slightly.` }
+    ]
+  }
+};
+
+// Quiz data for Learn panel
+const QUIZZES = {
+  arrays: [
+    { q:"What is the time complexity of accessing an element by index in an array?", opts:["O(n)","O(log n)","O(1)","O(n²)"], correct:2, explanation:"Arrays store elements at contiguous memory locations. Since the address of element i can be computed directly as base + i × size, access is constant time O(1) regardless of array size." },
+    { q:"Which algorithm finds the maximum sum subarray in O(n)?", opts:["Two pointer","Binary search","Kadane's algorithm","Divide and conquer (O(n log n))"], correct:2, explanation:"Kadane's algorithm keeps a 'current sum' that restarts from 0 whenever it goes negative. At each step, currentSum = max(arr[i], currentSum + arr[i]). It scans once, making it O(n)." },
+    { q:"Sliding window technique is most useful for problems involving:", opts:["Finding shortest path in a graph","Contiguous subarrays or substrings","Sorting arrays efficiently","Finding all permutations"], correct:1, explanation:"Sliding window maintains a 'window' of consecutive elements and expands/shrinks based on constraints. Perfect for problems like 'longest substring with at most k distinct chars' or 'max sum subarray of size k'." }
+  ],
+  "linked-lists": [
+    { q:"What is the time complexity of inserting at the beginning of a linked list?", opts:["O(n)","O(log n)","O(1)","O(n log n)"], correct:2, explanation:"Since we have a pointer to the head, insertion at the front just requires creating a new node and updating the head pointer — that's O(1), regardless of list length." },
+    { q:"Floyd's cycle detection algorithm uses:", opts:["One fast pointer","Two pointers at same speed","One slow and one fast pointer","Stack-based DFS"], correct:2, explanation:"Floyd's algorithm uses slow (1 step) and fast (2 steps) pointers. If there's a cycle, the fast pointer will eventually 'lap' the slow pointer and they'll meet. No extra space needed — O(1) space." }
+  ],
+  sorting: [
+    { q:"Which sorting algorithm is stable AND has O(n log n) guaranteed worst case?", opts:["Quick Sort","Heap Sort","Merge Sort","Shell Sort"], correct:2, explanation:"Merge Sort divides and merges in O(n log n) always (no bad pivots like Quick Sort). It's stable — equal elements preserve their original order. Trade-off: needs O(n) extra space." },
+    { q:"Quick Sort's worst case O(n²) occurs when:", opts:["Array is random","Array is already sorted (bad pivot choice)","Array has all unique elements","Array size is a prime number"], correct:1, explanation:"If we always pick the first or last element as pivot, a sorted (or reverse-sorted) array always gives the smallest/largest element as pivot — creating maximally unbalanced partitions of size n-1 and 0 each time." }
+  ],
+  dp: [
+    { q:"What are the two key properties required for a problem to be solvable with DP?", opts:["Greedy choice + sorting","Optimal substructure + overlapping subproblems","Divide and conquer + memoization","Linear structure + recursion"], correct:1, explanation:"DP requires: (1) Optimal Substructure — the optimal solution to the problem contains optimal solutions to subproblems. (2) Overlapping Subproblems — the same subproblems are solved multiple times. Memoization caches these." },
+    { q:"In Coin Change (min coins to make amount), if dp[amount] remains infinity, what does that mean?", opts:["The amount is zero","The amount cannot be made with given coins","We have infinite coins","The optimal answer is infinity"], correct:1, explanation:"We initialize dp[amount] = infinity (impossible) and only update it if we find a valid combination. If dp[amount] is still infinity after processing all sub-amounts, no combination of the given coins can sum to that amount." }
+  ]
+};
+
+// =================== PARTICLES ===================
+(function() {
+  const canvas = document.getElementById('particle-canvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [], animId;
+  function resize() { canvas.width = innerWidth; canvas.height = innerHeight; }
+  class P {
+    constructor() { this.reset(); }
+    reset() { this.x=Math.random()*canvas.width; this.y=Math.random()*canvas.height; this.vx=(Math.random()-.5)*.4; this.vy=(Math.random()-.5)*.4; this.r=Math.random()*1.5+.5; this.o=Math.random()*.5+.1; this.c=Math.random()<.6?'0,245,255':'0,255,136'; }
+    update() { this.x+=this.vx; this.y+=this.vy; if(this.x<0||this.x>canvas.width||this.y<0||this.y>canvas.height) this.reset(); }
+    draw() { ctx.beginPath(); ctx.arc(this.x,this.y,this.r,0,Math.PI*2); ctx.fillStyle=`rgba(${this.c},${this.o})`; ctx.fill(); }
+  }
+  function connect() {
+    const d=100;
+    for(let i=0;i<particles.length;i++) for(let j=i+1;j<particles.length;j++) {
+      const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y, dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<d) { ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y); ctx.strokeStyle=`rgba(0,245,255,${(1-dist/d)*.15})`; ctx.lineWidth=.5; ctx.stroke(); }
+    }
+  }
+  function animate() { ctx.clearRect(0,0,canvas.width,canvas.height); particles.forEach(p=>{p.update();p.draw();}); connect(); animId=requestAnimationFrame(animate); }
+  function init() { resize(); const c=Math.min(Math.floor(canvas.width*canvas.height/12000),100); particles=Array.from({length:c},()=>new P()); if(animId) cancelAnimationFrame(animId); animate(); }
+  window.addEventListener('resize', init);
+  init();
+})();
+
+// =================== ARIA ROBOT ===================
+const ARIA = {
+  speeches:["Hello! I'm ARIA — your AI dev assistant 🤖","Ask me about DSA, salaries, or hackathons!","Click 'Learn' on any card for interactive notes!","System online. Ready to assist, developer.","Tip: Solve 300+ LeetCode to crack FAANG!","Top skill to learn right now: System Design","Try clicking 'Learn' on a DSA card!","Hackathons → Projects → Offers. The formula."],
+  kb:{"50 lpa":`🎯 ROADMAP TO ₹50L+:\n\n1️⃣ Master DSA — Solve 300+ LeetCode (100 Hard)\n2️⃣ System Design — Grokking, DDIA book\n3️⃣ Target: Google, Meta, Amazon, Microsoft India\n4️⃣ Build real products used by thousands\n5️⃣ Timeline: 5-8 years of strategic growth\n6️⃣ Ace the full interview loop (4-6 rounds)\n\nKey skills: Distributed systems, ML basics, Leadership`,"hackathon":`🏆 TOP HACKATHONS:\n\n🇮🇳 India:\n• Smart India Hackathon (SIH) — Govt backed, massive\n• HackWithInfy — PPO opportunity\n• Flipkart Grid — Internship prizes\n• ETHIndia — $100K+ in bounties\n\n🌐 Global:\n• Google Code Jam — $15K prize\n• HackMIT — $30K prizes\n• Microsoft Imagine Cup — $100K\n\nTip: SIH + college hackathons are best for beginners!`,"dsa":`📊 DSA LEARNING PATH:\n\nWeek 1-4: Arrays, Strings, HashMap\nWeek 5-8: Stacks, Queues, Linked Lists\nWeek 9-12: Trees, Recursion, Backtracking\nWeek 13-16: Graphs (BFS/DFS, Dijkstra)\nWeek 17-20: DP (Memoization → Tabulation)\nWeek 21-24: Advanced Topics + Mock Interviews\n\n🎯 Target: 250-300 LeetCode problems\nFocus: Medium × 60%, Hard × 30%`,"company":`🏢 TOP HIRING COMPANIES (India):\n\n💎 FAANG: Google, Meta, Amazon, Microsoft\n₹25L-₹1Cr+\n\n🦄 Unicorns: Flipkart, Razorpay, CRED, Zomato\n₹15L-₹60L\n\n💰 Fintech: PhonePe, Zerodha, Paytm, Goldman\n₹15L-₹60L\n\nFresher targets: Zoho, Freshworks, TCS Digital`,"system design":`🏗️ SYSTEM DESIGN PREP:\n\n📚 Resources:\n• Grokking System Design (Educative)\n• System Design Interview (Alex Xu) — MUST READ\n• DDIA (Designing Data-Intensive Apps)\n\n🔑 Key Concepts:\n• CAP Theorem, ACID vs BASE\n• Load Balancing, CDN, Caching\n• Database sharding and replication\n• Message queues (Kafka, RabbitMQ)\n• Microservices vs Monolith`,"interview":`💼 INTERVIEW STRATEGY:\n\n1️⃣ DSA Round: Clarify → Brute Force → Optimize → Code\n2️⃣ System Design: Requirements → Estimates → Design → Bottlenecks\n3️⃣ HR Round: Use STAR method for behavioral\n4️⃣ Coding: Think aloud, edge cases first\n\n✅ Tools: LeetCode, Pramp, InterviewBit`,"default":`🤖 Hi! I'm ARIA, your dev career guide!\n\nI can help you with:\n• 💰 Salary roadmaps (₹5L → ₹50L+)\n• 🏆 Hackathon recommendations\n• 📊 DSA learning paths\n• 🏢 Company-specific prep\n• 💼 Interview strategies\n• 📖 Click 'Learn' on any card for interactive notes!\n\nTry asking: "How to crack Google?" or "Explain DP"`},
+  idx:0,
+  init() { this.setupRobot(); this.setupChat(); this.startCycle(); },
+  startCycle() {
+    const speech=document.getElementById('robot-speech'), text=document.getElementById('robot-text');
+    const show=(msg)=>{ speech.classList.remove('hidden'); text.textContent=''; let i=0; const t=()=>{ if(i<msg.length){text.textContent+=msg[i++];setTimeout(t,40);} }; t(); setTimeout(()=>speech.classList.add('hidden'),5000); };
+    show(this.speeches[0]);
+    setInterval(()=>{ this.idx=(this.idx+1)%this.speeches.length; show(this.speeches[this.idx]); },8000);
+  },
+  setupRobot() {
+    document.getElementById('robot').addEventListener('click',()=>this.toggle());
+    document.getElementById('robot-toggle').addEventListener('click',()=>this.toggle());
+  },
+  toggle() {
+    const p=document.getElementById('chat-panel');
+    if(p.classList.contains('hidden')){ p.classList.remove('hidden'); if(!document.getElementById('chat-messages').children.length) this.addMsg('aria',this.kb['default']); }
+    else p.classList.add('hidden');
+  },
+  setupChat() {
+    document.getElementById('chat-send').addEventListener('click',()=>this.send());
+    document.getElementById('chat-input').addEventListener('keydown',(e)=>{ if(e.key==='Enter') this.send(); });
+    document.getElementById('close-chat').addEventListener('click',()=>document.getElementById('chat-panel').classList.add('hidden'));
+    document.querySelectorAll('.qp').forEach(b=>b.addEventListener('click',()=>{ document.getElementById('chat-input').value=b.dataset.q; this.send(); document.getElementById('chat-panel').classList.remove('hidden'); }));
+  },
+  send() {
+    const inp=document.getElementById('chat-input');
+    const msg=inp.value.trim(); if(!msg) return;
+    this.addMsg('user',msg); inp.value='';
+    // Use Anthropic API for AI response
+    this.getAIResponse(msg);
+  },
+  async getAIResponse(msg) {
+    const container = document.getElementById('chat-messages');
+    // Show typing indicator
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'chat-msg aria';
+    typingDiv.innerHTML = '<div class="chat-avatar">🤖</div><div class="chat-bubble"><div class="ai-loader"><span></span><span></span><span></span></div></div>';
+    container.appendChild(typingDiv);
+    container.scrollTop = container.scrollHeight;
+
+    try {
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 1000,
+          system: "You are ARIA, an AI assistant embedded in DevQuest — a coding career platform for Indian developers. You help with DSA, programming languages, interview prep, salary guidance, and hackathons. Be concise, practical, and use emojis for readability. Focus on Indian tech market. Format responses with clear sections using emoji bullets. Keep answers under 300 words unless asked for detail.",
+          messages: [{ role: "user", content: msg }]
+        })
+      });
+      const data = await response.json();
+      const text = data.content?.[0]?.text || "Sorry, I couldn't get a response. Please try again!";
+      typingDiv.remove();
+      this.addMsg('aria', text);
+    } catch (e) {
+      typingDiv.remove();
+      // Fallback to local KB
+      const lower = msg.toLowerCase();
+      let resp = this.kb['default'];
+      if(lower.includes('50 lpa')||lower.includes('salary')||lower.includes('roadmap')) resp=this.kb['50 lpa'];
+      else if(lower.includes('hackathon')||lower.includes('competition')) resp=this.kb['hackathon'];
+      else if(lower.includes('dsa')||lower.includes('data structure')||lower.includes('algorithm')) resp=this.kb['dsa'];
+      else if(lower.includes('compan')||lower.includes('hiring')||lower.includes('job')) resp=this.kb['company'];
+      else if(lower.includes('system design')) resp=this.kb['system design'];
+      else if(lower.includes('interview')) resp=this.kb['interview'];
+      this.addMsg('aria', resp);
+    }
+  },
+  addMsg(sender,text) {
+    const c=document.getElementById('chat-messages');
+    const d=document.createElement('div'); d.className=`chat-msg ${sender==='user'?'user':'aria'}`;
+    const a=document.createElement('div'); a.className='chat-avatar'; a.textContent=sender==='user'?'👤':'🤖';
+    const b=document.createElement('div'); b.className='chat-bubble'; b.style.whiteSpace='pre-wrap'; b.textContent=text;
+    d.appendChild(a); d.appendChild(b); c.appendChild(d); c.scrollTop=c.scrollHeight;
+  }
+};
+
+// =================== LEARN PANEL ===================
+function openLearnPanel(topic, data, type) {
+  const panel = document.getElementById('learn-panel');
+  const title = document.getElementById('learn-panel-title');
+  const body = document.getElementById('learn-panel-body');
+  
+  title.textContent = `LEARN: ${data.title || topic}`;
+  
+  const quizData = QUIZZES[topic] || null;
+  const practiceData = data.practice || (data.topics ? [] : []);
+  
+  body.innerHTML = `
+    <div class="learn-section-title">${data.title || topic}</div>
+    <div class="learn-topic-tag">// ${type.toUpperCase()} MODULE</div>
+    
+    <div class="learn-tabs">
+      <button class="ltab active" data-ltab="notes">📖 Notes</button>
+      ${practiceData.length ? '<button class="ltab" data-ltab="practice">💻 Practice</button>' : ''}
+      ${quizData ? '<button class="ltab" data-ltab="quiz">🧠 Quiz</button>' : ''}
+    </div>
+    
+    <div class="learn-content-area" id="lca"></div>
+  `;
+  
+  // Render notes by default
+  renderLearnTab('notes', data, quizData, topic);
+  
+  // Tab switching
+  body.querySelectorAll('.ltab').forEach(t => {
+    t.addEventListener('click', () => {
+      body.querySelectorAll('.ltab').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      renderLearnTab(t.dataset.ltab, data, quizData, topic);
+    });
+  });
+  
+  panel.classList.add('open');
+}
+
+function renderLearnTab(tab, data, quizData, topic) {
+  const lca = document.getElementById('lca');
+  
+  if (tab === 'notes') {
+    const notes = data.notes || generateNotes(data);
+    lca.innerHTML = `
+      <div class="notes-block">
+        <h4>📖 CORE CONCEPTS</h4>
+        <div style="white-space:pre-wrap;color:var(--text-secondary);font-size:0.87rem;line-height:1.8">${formatNotes(notes)}</div>
+      </div>
+      ${data.topics ? `
+      <div class="notes-block">
+        <h4>🎯 KEY TOPICS TO MASTER</h4>
+        <ul>${data.topics.map(t=>`<li style="margin-bottom:8px">${t}</li>`).join('')}</ul>
+      </div>` : ''}
+      ${data.questions ? `
+      <div class="notes-block">
+        <h4>❓ COMMON INTERVIEW QUESTIONS</h4>
+        <ul>${data.questions.map(q=>`<li style="margin-bottom:8px">${q}</li>`).join('')}</ul>
+      </div>` : ''}
+    `;
+  } else if (tab === 'practice') {
+    const problems = data.practice || [];
+    if (!problems.length) { lca.innerHTML = '<div class="notes-empty">No practice problems for this topic yet.</div>'; return; }
+    lca.innerHTML = problems.map((p, idx) => `
+      <div class="practice-problem">
+        <div class="problem-header">
+          <span class="problem-num">LeetCode ${p.num}</span>
+          <span class="problem-title">${p.title}</span>
+          <span class="problem-diff diff-${p.diff}">${p.diff}</span>
+        </div>
+        <div class="problem-desc">${p.desc}</div>
+        <div class="problem-example">${p.example}</div>
+        <div class="problem-actions">
+          <button class="prob-btn prob-btn-hint" onclick="showProblemResponse(${idx},'hint','${topic}')">💡 Hint</button>
+          <button class="prob-btn prob-btn-solve" onclick="showProblemResponse(${idx},'solution','${topic}')">✅ Solution</button>
+          <button class="prob-btn prob-btn-explain" onclick="showProblemResponse(${idx},'explain','${topic}')">🤖 AI Explain</button>
+        </div>
+        <div class="ai-response-box" id="arb-${idx}">
+          <div class="ai-response-label" id="arl-${idx}">RESPONSE</div>
+          <div class="ai-response-text" id="art-${idx}"></div>
+        </div>
+      </div>
+    `).join('');
+    
+    // Store practice data globally for reference
+    window._currentPractice = data.practice;
+  } else if (tab === 'quiz') {
+    renderQuiz(quizData, lca, 0, {score:0, total:quizData.length});
+  }
+}
+
+function generateNotes(data) {
+  if (data.desc) return `**Overview:**\n${data.desc}\n\n**Topics covered:**\n${(data.topics||data.questions||[]).slice(0,6).join('\n')}`;
+  return 'Notes coming soon!';
+}
+
+function formatNotes(text) {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '<strong style="color:var(--accent-cyan)">$1</strong>')
+    .replace(/^(#{1,3})\s(.+)$/gm, (m,h,t) => `<strong style="color:var(--accent-gold);font-size:0.95rem">${t}</strong>`);
+}
+
+function showProblemResponse(idx, type, topic) {
+  const box = document.getElementById(`arb-${idx}`);
+  const label = document.getElementById(`arl-${idx}`);
+  const text = document.getElementById(`art-${idx}`);
+  const prob = window._currentPractice?.[idx];
+  if (!prob) return;
+  
+  box.classList.add('visible');
+  
+  if (type === 'explain') {
+    // Use AI
+    label.textContent = '🤖 AI EXPLANATION';
+    text.innerHTML = '<div class="ai-loader"><span></span><span></span><span></span></div>';
+    
+    fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        system: "You are a DSA teaching assistant. Explain coding problems step-by-step. Use clear language, explain the intuition, time/space complexity, and walk through an example. Be educational, not just give the answer.",
+        messages: [{ role: "user", content: `Explain how to solve this LeetCode problem with full intuition and code:\n\nProblem: ${prob.title}\n${prob.desc}\n\nExample: ${prob.example}\n\nPlease explain: 1) The intuition/key insight, 2) The approach, 3) Python code, 4) Time & space complexity` }]
+      })
+    }).then(r=>r.json()).then(d=>{
+      text.textContent = d.content?.[0]?.text || "Couldn't get AI explanation.";
+    }).catch(()=>{
+      text.textContent = prob.explain || "Explanation coming soon!";
+    });
+  } else if (type === 'hint') {
+    label.textContent = '💡 HINT';
+    text.textContent = prob.hint;
+  } else {
+    label.textContent = '✅ SOLUTION APPROACH';
+    text.textContent = prob.solution;
+  }
+}
+
+function renderQuiz(questions, container, qIdx, state) {
+  if (qIdx >= questions.length) {
+    const pct = Math.round(state.score / state.total * 100);
+    container.innerHTML = `
+      <div class="notes-block" style="text-align:center;padding:32px">
+        <div style="font-size:3rem;margin-bottom:16px">${pct>=70?'🏆':pct>=40?'💪':'📚'}</div>
+        <div style="font-family:var(--font-display);font-size:1.5rem;color:${pct>=70?'var(--accent-green)':pct>=40?'var(--accent-gold)':'var(--accent-orange)'}">
+          ${state.score}/${state.total} correct
+        </div>
+        <div style="color:var(--text-secondary);margin-top:8px;font-size:0.9rem">
+          ${pct>=70?'Excellent! You know this topic well.':pct>=40?'Good progress! Review the notes for improvement.':'Go back to notes and revisit the concepts.'}
+        </div>
+        <button class="quiz-next-btn" style="margin-top:20px" onclick="renderQuiz(${JSON.stringify(questions).replace(/</g,'&lt;')}, document.getElementById('lca'), 0, {score:0,total:${questions.length}})">Retry Quiz</button>
+      </div>
+    `;
+    return;
+  }
+  
+  const q = questions[qIdx];
+  container.innerHTML = `
+    <div style="font-family:var(--font-mono);font-size:0.68rem;color:var(--text-muted);margin-bottom:12px;letter-spacing:2px">
+      QUESTION ${qIdx+1} OF ${questions.length}
+    </div>
+    <div class="quiz-question">${q.q}</div>
+    <div class="quiz-options">
+      ${q.opts.map((o,i)=>`<button class="quiz-opt" data-idx="${i}">${String.fromCharCode(65+i)}. ${o}</button>`).join('')}
+    </div>
+    <div class="quiz-feedback" id="qfb"></div>
+  `;
+  
+  container.querySelectorAll('.quiz-opt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const chosen = parseInt(btn.dataset.idx);
+      container.querySelectorAll('.quiz-opt').forEach(b => b.style.pointerEvents='none');
+      
+      if (chosen === q.correct) {
+        btn.classList.add('correct');
+        state.score++;
+      } else {
+        btn.classList.add('wrong');
+        container.querySelectorAll('.quiz-opt')[q.correct].classList.add('correct');
+      }
+      
+      const fb = document.getElementById('qfb');
+      fb.textContent = `${chosen===q.correct?'✅ Correct!':'❌ Wrong!'} ${q.explanation}`;
+      fb.classList.add('show');
+      
+      const nextBtn = document.createElement('button');
+      nextBtn.className = 'quiz-next-btn';
+      nextBtn.textContent = qIdx < questions.length - 1 ? 'Next Question →' : 'See Results';
+      nextBtn.addEventListener('click', () => renderQuiz(questions, container, qIdx+1, state));
+      fb.after(nextBtn);
+    });
+  });
+}
+
+function closeLearnPanel() {
+  document.getElementById('learn-panel').classList.remove('open');
+}
+
+// =================== RENDER FUNCTIONS ===================
+function renderLanguages(filter='all') {
+  const grid = document.getElementById('lang-grid');
+  const langs = filter==='all' ? DB.languages : DB.languages.filter(l=>l.category.includes(filter));
+  grid.innerHTML = langs.map(l => `
+    <div class="lang-card reveal" style="--card-accent:${l.accent}" data-id="${l.id}">
+      <div class="lang-card-icon">${l.icon}</div>
+      <div class="lang-card-name">${l.name}</div>
+      <div class="lang-card-type">${l.type}</div>
+      <div class="lang-card-desc">${l.desc}</div>
+      <div class="lang-card-tags">${l.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+      <div style="margin-top:14px;display:flex;gap:8px">
+        <button class="prob-btn prob-btn-solve" style="font-size:0.7rem" onclick="openLangModal('${l.id}')">📖 Details</button>
+        <button class="prob-btn prob-btn-explain" style="font-size:0.7rem" onclick="openLangLearn('${l.id}')">🎓 Learn</button>
+      </div>
+    </div>
+  `).join('');
+  triggerReveal();
+}
+
+function openLangLearn(id) {
+  const lang = DB.languages.find(l=>l.id===id);
+  if(!lang) return;
+  openLearnPanel(id, {
+    title: lang.name + ' — Core Concepts',
+    notes: lang.notes,
+    topics: lang.uses,
+  }, 'language');
+}
+
+function openLangModal(id) {
+  const lang = DB.languages.find(l=>l.id===id);
+  if(!lang) return;
+  const content = document.getElementById('modal-content');
+  content.innerHTML = `
+    <div class="modal-lang-icon">${lang.icon}</div>
+    <div class="modal-lang-name" style="color:${lang.accent}">${lang.name}</div>
+    <div class="modal-lang-tagline">${lang.tagline}</div>
+    <div class="modal-section"><h3>// Overview</h3><p>${lang.overview}</p></div>
+    <div class="modal-section"><h3>// Primary Use Cases</h3><ul>${lang.uses.map(u=>`<li>${u}</li>`).join('')}</ul></div>
+    <div class="modal-section"><h3>// Syntax Example</h3><div class="code-block">${lang.syntax.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div></div>
+    <div class="modal-section"><h3>// Key Ecosystem</h3><div>${lang.ecosystem.map(e=>`<span class="tag">${e}</span>`).join('')}</div></div>
+    <div class="modal-section"><h3>// Salary Range (India)</h3><p style="color:var(--accent-green);font-family:var(--font-display);font-size:1.1rem">${lang.salary}</p></div>
+    <div class="modal-section"><h3>// Top Hiring Companies</h3><div>${lang.topCompanies.map(c=>`<span class="tag">${c}</span>`).join('')}</div></div>
+  `;
+  document.getElementById('lang-modal').classList.remove('hidden');
+  document.body.style.overflow='hidden';
+}
+
+function renderRoadmap() {
+  const container = document.getElementById('roadmap-container');
+  container.innerHTML = `
+    <div class="roadmap-line"></div>
+    <div class="roadmap-steps">
+      ${DB.roadmap.map((step,i)=>`
+        <div class="roadmap-step ${i%2===0?'left':'right'} reveal">
+          <div class="roadmap-step-content">
+            <div class="roadmap-salary" style="color:${step.color}">${step.salary}</div>
+            <div class="roadmap-title">${step.title}</div>
+            <div class="roadmap-desc">${step.desc}</div>
+            <div>${step.skills.map(s=>`<span class="skill-pill">${s}</span>`).join('')}</div>
+            <div style="margin-top:12px"><div style="font-family:var(--font-mono);font-size:0.72rem;color:var(--accent-green);margin-bottom:8px">▸ ACTION ITEMS</div>
+            ${step.actions.map(a=>`<div style="font-size:0.83rem;color:var(--text-secondary);padding:3px 0">✓ ${a}</div>`).join('')}</div>
+            <div style="margin-top:10px;font-family:var(--font-mono);font-size:0.7rem;color:var(--text-muted)">⏱ ${step.duration}</div>
+          </div>
+          <div class="roadmap-node" style="background:${step.color}15;border-color:${step.color};color:${step.color}">${step.level}</div>
+          <div class="roadmap-spacer"></div>
+        </div>`).join('')}
+    </div>`;
+  triggerReveal();
+}
+
+function renderDSA(tab) {
+  const content = document.getElementById('dsa-content');
+  const data = DB.dsa[tab];
+  content.innerHTML = data.map(item=>`
+    <div class="dsa-card reveal">
+      <button class="learn-btn" onclick="openLearnPanel('${item.id}',${JSON.stringify(item).replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,'&#39;')}, 'dsa')">🎓 Learn</button>
+      <div class="dsa-card-title">${item.title}</div>
+      <span class="difficulty-badge diff-${item.difficulty}">${item.difficulty}</span>
+      <div class="dsa-card-body">${item.desc}</div>
+      <ul class="dsa-card-list">${item.topics.slice(0,4).map(t=>`<li>${t}</li>`).join('')}</ul>
+    </div>
+  `).join('');
+  triggerReveal();
+}
+
+function renderCompanies() {
+  document.getElementById('company-grid').innerHTML = DB.companies.map(co=>`
+    <div class="company-card reveal" style="--company-color:${co.color}">
+      <div class="company-logo">${co.logo}</div>
+      <div class="company-name">${co.name}</div>
+      <div class="company-type">${co.type}</div>
+      <div class="company-salary">${co.salary}</div>
+      <div class="company-focus">${co.focus}</div>
+      <div>${co.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+    </div>`).join('');
+  triggerReveal();
+}
+
+function renderHackathons() {
+  document.getElementById('hack-grid').innerHTML = DB.hackathons.map(h=>`
+    <div class="hack-card reveal">
+      <span class="hack-badge hack-${h.type}">${h.type==='india'?'🇮🇳 India':'🌐 Global'}</span>
+      <div class="hack-icon">${h.icon}</div>
+      <div class="hack-name">${h.name}</div>
+      <div class="hack-org">${h.org}</div>
+      <div class="hack-desc">${h.desc}</div>
+      <div class="hack-prize">🏆 ${h.prize}</div>
+    </div>`).join('');
+  triggerReveal();
+}
+
+function renderInterviews(tab) {
+  const content = document.getElementById('interview-content');
+  const data = DB.interviews[tab];
+  content.innerHTML = data.map(item=>`
+    <div class="int-card reveal">
+      <button class="learn-btn" onclick="openLearnPanel('${item.id}',${JSON.stringify(item).replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,'&#39;')}, 'interview')">🎓 Learn</button>
+      <div class="int-card-title">${item.title}</div>
+      <span class="difficulty-badge diff-${item.difficulty}">${item.difficulty}</span>
+      <ul class="dsa-card-list" style="margin-top:12px">${item.questions.map(q=>`<li>${q}</li>`).join('')}</ul>
+    </div>`).join('');
+  triggerReveal();
+}
+
+// =================== NAVBAR ===================
+function initNavbar() {
+  const nav = document.getElementById('navbar');
+  window.addEventListener('scroll', ()=>nav.classList.toggle('scrolled', scrollY>60));
+  const sections = document.querySelectorAll('section[id]');
+  window.addEventListener('scroll', ()=>{
+    let cur='';
+    sections.forEach(s=>{ if(scrollY>=s.offsetTop-100) cur=s.id; });
+    document.querySelectorAll('.nav-a').forEach(a=>a.classList.toggle('active',a.getAttribute('href')===`#${cur}`));
+  });
+}
+
+// =================== FILTERS & TABS ===================
+function initFilters() {
+  document.querySelectorAll('.filter-btn').forEach(b=>{
+    b.addEventListener('click',()=>{ document.querySelectorAll('.filter-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); renderLanguages(b.dataset.filter); });
+  });
+}
+
+function initTabs() {
+  document.querySelectorAll('.dsa-tab').forEach(t=>t.addEventListener('click',()=>{ document.querySelectorAll('.dsa-tab').forEach(x=>x.classList.remove('active')); t.classList.add('active'); renderDSA(t.dataset.tab); }));
+  document.querySelectorAll('.int-tab').forEach(t=>t.addEventListener('click',()=>{ document.querySelectorAll('.int-tab').forEach(x=>x.classList.remove('active')); t.classList.add('active'); renderInterviews(t.dataset.tab); }));
+}
+
+// =================== MODAL ===================
+function initModal() {
+  document.getElementById('modal-close').addEventListener('click',()=>{ document.getElementById('lang-modal').classList.add('hidden'); document.body.style.overflow=''; });
+  document.getElementById('lang-modal').addEventListener('click',(e)=>{ if(e.target===document.getElementById('lang-modal')){ document.getElementById('lang-modal').classList.add('hidden'); document.body.style.overflow=''; } });
+}
+
+// =================== COUNTERS ===================
+function initCounters() {
+  const obs = new IntersectionObserver(entries=>entries.forEach(e=>{
+    if(e.isIntersecting) {
+      const el=e.target, tgt=parseInt(el.dataset.target); let cur=0;
+      const step=tgt/60, timer=setInterval(()=>{ cur+=step; if(cur>=tgt){el.textContent=tgt;clearInterval(timer);}else el.textContent=Math.floor(cur); },25);
+      obs.unobserve(el);
+    }
+  }));
+  document.querySelectorAll('.stat-num').forEach(c=>obs.observe(c));
+}
+
+// =================== SCROLL REVEAL ===================
+function triggerReveal() {
+  setTimeout(()=>{
+    const obs = new IntersectionObserver(entries=>entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); }),{threshold:0.05});
+    document.querySelectorAll('.reveal:not(.visible)').forEach(el=>obs.observe(el));
+  },50);
+}
+
+// =================== NOTES SIDEBAR ===================
+const savedNotes = [];
+function initNotesSidebar() {
+  document.getElementById('notes-toggle-btn').addEventListener('click',()=>{
+    document.getElementById('notes-sidebar').classList.toggle('open');
+  });
+  renderNotesList();
+}
+
+function renderNotesList() {
+  const list = document.getElementById('notes-list');
+  if (!savedNotes.length) { list.innerHTML='<div class="notes-empty">No saved notes yet.<br>Open Learn Mode on any topic to study!</div>'; return; }
+  list.innerHTML = savedNotes.map((n,i)=>`
+    <div class="note-item" onclick="openLearnPanel('${n.id}',${JSON.stringify(n.data)}, '${n.type}')">
+      <div class="note-item-title">${n.title}</div>
+      <div class="note-item-meta">${n.type} · Saved ${n.time}</div>
+    </div>`).join('');
+}
+
+// =================== INIT ===================
+document.addEventListener('DOMContentLoaded', ()=>{
+  ARIA.init();
+  initNavbar();
+  renderLanguages();
+  renderRoadmap();
+  renderDSA('ds');
+  renderCompanies();
+  renderHackathons();
+  renderInterviews('technical');
+  initCounters();
+  triggerReveal();
+  initFilters();
+  initTabs();
+  initModal();
+  initNotesSidebar();
+  
+  // Notes toggle hint
+  setTimeout(()=>{
+    const speech=document.getElementById('robot-speech'), text=document.getElementById('robot-text');
+    speech.classList.remove('hidden');
+    text.textContent='';
+    const msg='🎓 Try clicking "Learn" on any DSA card!';
+    let i=0; const t=()=>{ if(i<msg.length){text.textContent+=msg[i++];setTimeout(t,35);} }; t();
+    setTimeout(()=>speech.classList.add('hidden'),5000);
+  },3000);
+});
+</script>
 </body>
 </html>
